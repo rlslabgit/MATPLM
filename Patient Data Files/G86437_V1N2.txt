@@ -1,0 +1,30 @@
+PatientID: G86437_V1N2
+
+min IMI: 10	 maxIMI: 90
+PLM End before Apnea starts: 0.50	 PLM Start before Apnea Ends : 0.50
+PLM End before Arousal starts: 0.50	 PLM Start before Arousal Ends : 0.50
+
+PLMS/hr: 247.06
+	 median IMI PLMS: 14.10
+	 mean log IMI PLMS: 2.58
+	 median log IMI PLMS: 2.65
+	 mean duration PLMS: 4.56
+PLMSt/hr: 213.33
+	 median IMI PLMSt: 14.53
+	 mean log IMI PLMSt: 2.73
+	 median log IMI PLMSt: 2.68
+	 mean duration PLMSt: 4.73
+
+After exclusion of apnea-related events:
+PLMS/hr: 247.06
+	 median IMI PLMS: 14.10
+	 mean log IMI PLMS: 2.58
+	 median log IMI PLMS: 2.65
+	 mean duration PLMS: 4.56
+PLMSt/hr: 213.33
+	 median IMI PLMSt: 14.53
+	 mean log IMI PLMSt: 2.73
+	 median log IMI PLMSt: 2.68
+	 mean duration PLMSt: 4.73
+
+Dynamic Threshold (yes)	 'Empty' PLM removed (no)

@@ -1,0 +1,40 @@
+PatientID: G81356_V1N2
+
+Total Sleep Time: 6.6 hrs	Total Recording Time: 7.9 hrs
+Sleep Efficiency: 84.0%
+
+min IMI: 10	 maxIMI: 90
+PLM End before Apnea starts: 0.50	 PLM Start before Apnea Ends : 0.50
+PLM End before Arousal starts: 0.50	 PLM Start before Arousal Ends : 0.50
+
+Number of LM (IMI > 1) in sleep: 1225
+Number of LM (IMI > 10) in sleep: 1068
+Number of PLM (IMI > 1) in sleep: 1216
+Number of PLM (IMI > 10) in sleep: 1059
+
+Periodicity Index: 0.86
+
+PLMS/hr: 184.24
+	 median IMI PLMS: 16.89
+	 mean log IMI PLMS: 2.73
+	 median log IMI PLMS: 2.83
+	 mean duration PLMS: 3.31
+PLMSt/hr: 160.45
+	 median IMI PLMSt: 18.43
+	 mean log IMI PLMSt: 2.94
+	 median log IMI PLMSt: 2.91
+	 mean duration PLMSt: 3.49
+
+After exclusion of apnea-related events:
+PLMS/hr: 184.24
+	 median IMI PLMS: 16.89
+	 mean log IMI PLMS: 2.73
+	 median log IMI PLMS: 2.83
+	 mean duration PLMS: 3.31
+PLMSt/hr: 160.45
+	 median IMI PLMSt: 18.43
+	 mean log IMI PLMSt: 2.94
+	 median log IMI PLMSt: 2.91
+	 mean duration PLMSt: 3.49
+
+Dynamic Threshold (yes)	 'Empty' PLM removed (no)
