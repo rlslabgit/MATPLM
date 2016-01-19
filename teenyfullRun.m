@@ -1,7 +1,7 @@
 % WARNING: This is a really terrible program. It does the bare minimum and
 % has poor documentation. Created 11/13 to get each leg seperately for
 % RestEaze validation. Does no error handling, so should not be used for
-% batch processing
+% batch processing f
 
 function [rCLMS,rPLMS,rdsEMG,lCLMS,lPLMS,ldsEMG,sleepRecordStart,sleepRecordEnd] = teenyfullRun(StructName)
 
