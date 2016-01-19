@@ -6,6 +6,8 @@ if doMed == 1
     lLM = cutLowMedian(ldsEMG,lLM,2,500);
 end
 
+%dumb
+
 % Combine left and right and sort.
 rLM(:,13) = 1; lLM(:,13) = 2;
 combLM = [rLM;lLM];
