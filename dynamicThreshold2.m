@@ -54,7 +54,7 @@ end
 function baseline = scanning3(dsEMG,minT)
 
 h = dsEMG(dsEMG(:,2) > dsEMG(:,1),2);
-g = histc(h,1:300);
+g = histc(h,0:300);
 [~,b] = max(g);
 
 if b > minT

@@ -19,8 +19,8 @@ tic
 
 % ProtocolDIR is the path to the directory containing the subject folders.
 % Must end in '/'
-ProtocolDIR = 'C:/Users/Administrator/Desktop/TEST for CONVERT/';                   %
-modDateAfter = '17-Aug-2015 9:03:00'; %
+ProtocolDIR = 'Y:/COPD data/';                   %
+modDateAfter = '13-Jan-2016 5:03:00'; %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 listPSGFolders = dir(ProtocolDIR);
