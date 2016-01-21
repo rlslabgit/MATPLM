@@ -214,7 +214,7 @@ TRT = size(epochStage,1)/2/60;
 
 % Write numerical outputs to a text file, and place in the subfolder
 % 'Patient Data Files.'
-fileID = fopen(['Patient Data Files\' patientID '.txt'],'w');
+fileID = fopen(['Patient Data Files/' patientID '.txt'],'w');
 
 fprintf(fileID,'PatientID: %s\n',patientID);
 fprintf(fileID,'\nTotal Sleep Time: %.1f hrs\tTotal Recording Time: %.1f hrs\n',...
@@ -261,7 +261,11 @@ if doMed == 1, dM = 'yes';
 else dM = 'no';
 end
 
-fprintf(fileID,'\nDynamic Threshold (%s)\t ''Empty'' PLM removed (%s)\n',...
-    dS,dM);
+% if the folder doesn't exist, don't worry about it
+if fileID > 0
+    fprintf(fileID,'\nDynamic Threshold (%s)\t ''Empty'' PLM removed (%s)\n',...
+        dS,dM);
+end
+
 fclose(fileID);
 end
