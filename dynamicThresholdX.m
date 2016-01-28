@@ -1,4 +1,4 @@
-function [dsEMG,threshes,minT] = dynamicThresholdX(dsEMG,fs)
+function [ndsEMG,threshes,minT] = dynamicThresholdX(dsEMG,fs)
 %% Normalize dsEMG signal to a common baseline
 % [dsEMG,threshes] = dynamicThreshold2(dsEMG,fs);
 %
@@ -23,15 +23,17 @@ bigWindow = 15*fs; littleWindow = (0.1)*fs+1;
 
 threshes = zeros(floor(size(dsEMG,1)/bigWindow),1);
 badEps = []; % epoch numbers (in bigWindow epochs) of noisey signal
+ndsEMG = dsEMG * 0;
 
 
 % Calculate our max allowable value: 5 standard deviations above the mean
 % of the central 1/2 second long window
 s = movingstd(dsEMG,littleWindow,'central')*5;
 dsEMG(:,2) = smooth(dsEMG(:,1),littleWindow) + s;
+clear s; 
 
 % Let's try rounding this for now, it's easier than binning.
-dsEMG(:,2) = round(dsEMG(:,2));
+% dsEMG(:,2) = round(dsEMG(:,2));
 
 % Set the minimum threshold to the baseline of the first epoch
 % The hard-coded 2 means don't set a baseline less than 2
@@ -49,25 +51,26 @@ end
 for i = 1:size(threshes,1)-1
     % NEW STANDARDS (if > 16 above noise, ignore)
     if threshes(i) > (minT + 16)
-        dsEMG(bigWindow*(i-1)+1:bigWindow*i) = minT;
+        ndsEMG(bigWindow*(i-1)+1:bigWindow*i,1) = ...
+            ones(size(bigWindow*(i-1)+1:bigWindow*i,2),1) * minT;
         badEps = [badEps ; i]; %#ok<AGROW>
     else
-        dsEMG(bigWindow*(i-1)+1:bigWindow*i)...
+        ndsEMG(bigWindow*(i-1)+1:bigWindow*i)...
             = dsEMG(bigWindow*(i-1)+1:bigWindow*i) * minT / threshes(i);
     end
 end
 
-dsEMG(size(threshes,1)*bigWindow:end)...
-        = dsEMG(size(threshes,1)*bigWindow:end) * minT / threshes(end);
+ndsEMG(size(threshes,1)*bigWindow:end)...
+        = dsEMG(size(threshes,1)*bigWindow:end,1) * minT / threshes(end);
         
-dsEMG = dsEMG(:,1);
+
 end
 
 
 % Find the baseline of a bigWindow epoch
 function baseline = scanning3(dsEMG,minT)
 
-h = dsEMG(dsEMG(:,2) > dsEMG(:,1),2);
+% h = dsEMG(dsEMG(:,2) > dsEMG(:,1),2);
 
 % The ol' histogram try
 % g = histc(h,0:2:300);
@@ -84,11 +87,17 @@ h = dsEMG(dsEMG(:,2) > dsEMG(:,1),2);
 % baseline = mode(h);
 
 % Longest run
-A = findseq(h);
-if isempty(A) % seen when device unplugged. Ignore this section
+tol = 2;
+ds = abs(diff(dsEMG(:,2)));
+ds = ds < tol;
+
+A = findseq(+ds);
+if isempty(A) %|| max(A(:,4),1) == 0 % seen when device unplugged. Ignore this section
     baseline = minT + 100;
 else
-    baseline = A(find(A(:,4) == max(A(:,4)),1));
+    indx = find(A(:,4) == max(A(:,4)));
+    baseline = floor(median(dsEMG(A(indx,2)+1:A(indx,3),2)));
+    % baseline = A(find(A(:,4) == max(A(:,4)),1));
 end
 
    end
