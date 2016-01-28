@@ -94,15 +94,19 @@ catch
 end
 
 if doDynamic == 1
-    nldsEMG = dynamicThreshold2(ldsEMG,in.fs); % Use normalized, DON'T RETURN
-    nrdsEMG = dynamicThreshold2(rdsEMG,in.fs);
+    [nldsEMG,~,lminT] = dynamicThresholdX(ldsEMG,500);
+    [nrdsEMG,~,rminT] = dynamicThresholdX(rdsEMG,500);
+%     nldsEMG = dynamicThreshold2(ldsEMG,in.fs); % Use normalized, DON'T RETURN
+%     nrdsEMG = dynamicThreshold2(rdsEMG,in.fs);
      
     % Run ComboMasterPlan w/ thresholds at 4 and 10 
-    % Uses normalized dsEMG vectors, but returns originals.
-    % May be better to return new vectors, but I don't know if that makes
-    % sense
+%     [CLM,PLM,rCLM,lCLM,PLMnoAp,CLMnoAp] = miniCOMBOmasterPlanForPLM(nrdsEMG,nldsEMG,...
+%         4,4,10,10,0.5,0.5,in.fs,in.maxdur,epochStage,30,in.maxIMI,3,...
+%         ApneaData,ArousalData,HypnogramStart,in.lb1,in.ub1,in.lb2,in.ub2,doMed);
+
+    % Run ComboMasterPlan w/ thresholds minT
     [CLM,PLM,rCLM,lCLM,PLMnoAp,CLMnoAp] = miniCOMBOmasterPlanForPLM(nrdsEMG,nldsEMG,...
-        4,4,10,10,0.5,0.5,in.fs,in.maxdur,epochStage,30,in.maxIMI,3,...
+        lminT,rminT,lminT+6,rminT+6,0.5,0.5,in.fs,in.maxdur,epochStage,30,in.maxIMI,3,...
         ApneaData,ArousalData,HypnogramStart,in.lb1,in.ub1,in.lb2,in.ub2,doMed);
     
 else
@@ -122,8 +126,8 @@ end
 [PLMtnoAp] = minimasterPlanForPLMt(CLMnoAp,in.minIMI,in.fs,in.maxIMI,3,in.maxdur);
 
 % Write the results to a file in the Patient Data Files subfolder
-writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,doMed,inputname(1),...
-    CLM,CLMt);
+% writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,doMed,inputname(1),...
+%     CLM,CLMt);
 
 % Plot results, LM1 is left leg, LM2 is right leg, PLM is all PLMS in sleep
 % with IMI > minIMIDuration
@@ -189,83 +193,4 @@ end
 
 doDynamic = str2num(answer{size(valnames,1)+1});
 doMed = str2num(answer{size(valnames,1)+2});
-end
-
-
-
-
-
-
-
-% Write certain data to a text file contained in the subfolder Patient Data
-% Files. 
-function writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,...
-    doMed,patientID,CLM,CLMt)
-
-% Get only movements during sleep
-PLMS = PLM(PLM(:,6) > 0,:); PLMSIMI = PLMS(PLMS(:,4) < 90,:);
-PLMSt = PLMt(PLMt(:,6) > 0,:); PLMSIMIt = PLMSt(PLMSt(:,4) < 90,:);
-
-PLMSnoAp = PLMnoAp(PLMnoAp(:,6) > 0,:); PLMSIMInoAp = PLMSnoAp(PLMSnoAp(:,4) < 90,:);
-PLMStnoAp = PLMtnoAp(PLMtnoAp(:,6) > 0,:); PLMSIMItnoAp = PLMStnoAp(PLMStnoAp(:,4) < 90,:);
-
-TST = size(find(epochStage),1)/2/60;
-TRT = size(epochStage,1)/2/60;
-
-% Write numerical outputs to a text file, and place in the subfolder
-% 'Patient Data Files.'
-fileID = fopen(['Patient Data Files/' patientID '.txt'],'w');
-
-fprintf(fileID,'PatientID: %s\n',patientID);
-fprintf(fileID,'\nTotal Sleep Time: %.1f hrs\tTotal Recording Time: %.1f hrs\n',...
-    TST,TRT);
-fprintf(fileID,'Sleep Efficiency: %.1f%%\n',TST/TRT*100);
-fprintf(fileID,'\nmin IMI: %d\t maxIMI: %d\n', in.minIMI, in.maxIMI);
-fprintf(fileID,'PLM End before Apnea starts: %.2f\t PLM Start before Apnea Ends : %.2f\n',in.lb1, in.ub1);
-fprintf(fileID,'PLM End before Arousal starts: %.2f\t PLM Start before Arousal Ends : %.2f\n',in.lb2, in.ub2);
-
-fprintf(fileID,'\nNumber of LM (IMI > 1) in sleep: %d\n', size(CLM(CLM(:,6) > 0,1),1));
-fprintf(fileID,'Number of LM (IMI > %d) in sleep: %d\n', in.minIMI, size(CLMt(CLMt(:,6) > 0,1),1));
-fprintf(fileID,'Number of PLM (IMI > 1) in sleep: %d\n', size(PLMS,1));
-fprintf(fileID,'Number of PLM (IMI > %d) in sleep: %d\n', in.minIMI, size(PLMSt,1));
-
-fprintf(fileID,'\nPeriodicity Index: %.2f\n',size(PLMSt,1)/size(CLM(CLM(:,6) > 0,1),1));
-
-fprintf(fileID,'\nPLMS/hr: %.2f\n', size(PLMS,1)/TST);
-fprintf(fileID,'\t median IMI PLMS: %.2f\n',median(PLMSIMI(:,4)));
-fprintf(fileID,'\t mean log IMI PLMS: %.2f\n',mean(log(PLMSIMI(:,4))));
-fprintf(fileID,'\t median log IMI PLMS: %.2f\n',median(log(PLMSIMI(:,4))));
-fprintf(fileID,'\t mean duration PLMS: %.2f\n',mean(PLMSIMI(:,3)));
-fprintf(fileID,'PLMSt/hr: %.2f\n', size(PLMSt,1)/TST);
-fprintf(fileID,'\t median IMI PLMSt: %.2f\n',median(PLMSIMIt(:,4)));
-fprintf(fileID,'\t mean log IMI PLMSt: %.2f\n',mean(log(PLMSIMIt(:,4))));
-fprintf(fileID,'\t median log IMI PLMSt: %.2f\n',median(log(PLMSIMIt(:,4))));
-fprintf(fileID,'\t mean duration PLMSt: %.2f\n',mean(PLMSIMIt(:,3)));
-
-fprintf(fileID,'\nAfter exclusion of apnea-related events:\n');
-fprintf(fileID,'PLMS/hr: %.2f\n', size(PLMSnoAp,1)/TST);
-fprintf(fileID,'\t median IMI PLMS: %.2f\n',median(PLMSIMInoAp(:,4)));
-fprintf(fileID,'\t mean log IMI PLMS: %.2f\n',mean(log(PLMSIMInoAp(:,4))));
-fprintf(fileID,'\t median log IMI PLMS: %.2f\n',median(log(PLMSIMInoAp(:,4))));
-fprintf(fileID,'\t mean duration PLMS: %.2f\n',mean(PLMSIMInoAp(:,3)));
-fprintf(fileID,'PLMSt/hr: %.2f\n', size(PLMStnoAp,1)/TST);
-fprintf(fileID,'\t median IMI PLMSt: %.2f\n',median(PLMSIMItnoAp(:,4)));
-fprintf(fileID,'\t mean log IMI PLMSt: %.2f\n',mean(log(PLMSIMItnoAp(:,4))));
-fprintf(fileID,'\t median log IMI PLMSt: %.2f\n',median(log(PLMSIMItnoAp(:,4))));
-fprintf(fileID,'\t mean duration PLMSt: %.2f\n',mean(PLMSIMItnoAp(:,3)));
-
-if doDynamic == 1, dS = 'yes';
-else dS = 'no';
-end
-if doMed == 1, dM = 'yes';
-else dM = 'no';
-end
-
-% if the folder doesn't exist, don't worry about it
-if fileID > 0
-    fprintf(fileID,'\nDynamic Threshold (%s)\t ''Empty'' PLM removed (%s)\n',...
-        dS,dM);
-end
-
-fclose(fileID);
 end
