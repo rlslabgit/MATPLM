@@ -1,4 +1,4 @@
-function [ndsEMG,threshes,minT] = dynamicThresholdX(dsEMG,fs)
+function [ndsEMG,threshes,minT,badEps] = dynamicThresholdX(dsEMG,fs)
 %% Normalize dsEMG signal to a common baseline
 % [dsEMG,threshes] = dynamicThreshold2(dsEMG,fs);
 %
