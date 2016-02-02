@@ -36,15 +36,21 @@ clear s;
 % dsEMG(:,2) = round(dsEMG(:,2));
 
 % Set the minimum threshold to the baseline of the first epoch
-% The hard-coded 2 means don't set a baseline less than 2
-minT = scanning3(dsEMG(1:20*fs,:),2);
+
+% minT = scanning3(dsEMG(1:20*fs,:),2);
 
 
 % Loop through bigWindows
 for n = 0:(floor(size(dsEMG,1)/bigWindow)-1)        
     % Calculate baseline of this bigWindow and save for later adjustment
-    threshes(n+1) = scanning3(dsEMG(n*bigWindow+1:(n+1)*bigWindow,:),minT); 
+    % The hard-coded 2 means don't set a baseline less than 2
+    threshes(n+1) = scanning3(dsEMG(n*bigWindow+1:(n+1)*bigWindow,:),2); 
 end
+
+% Instead of first epoch, try the mode?
+minT = mode(threshes);
+threshes(threshes < minT) = minT;
+
 
 % Apply scaling factor to each section of the dsEMG
 
@@ -53,6 +59,7 @@ for i = 1:size(threshes,1)-1
     if threshes(i) > (minT + 16)
         ndsEMG(bigWindow*(i-1)+1:bigWindow*i,1) = ...
             ones(size(bigWindow*(i-1)+1:bigWindow*i,2),1) * minT;
+        threshes(i) = -1; % mark this a bad epoch
         badEps = [badEps ; i]; %#ok<AGROW>
     else
         ndsEMG(bigWindow*(i-1)+1:bigWindow*i)...
@@ -97,6 +104,9 @@ if isempty(A) %|| max(A(:,4),1) == 0 % seen when device unplugged. Ignore this s
 else
     indx = find(A(:,4) == max(A(:,4)));
     baseline = floor(median(dsEMG(A(indx,2)+1:A(indx,3),2)));
+    if baseline < minT
+        baseline = minT;
+    end
     % baseline = A(find(A(:,4) == max(A(:,4)),1));
 end
 
