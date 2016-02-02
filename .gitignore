@@ -5,3 +5,4 @@ teeny*
 Patient Data Files/*.txt
 Patient Data Files/*.m
 writeToFile.m
+FragBatch.m
