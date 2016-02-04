@@ -28,9 +28,9 @@ for i = 1:dirlength
     zoomAdaptiveLogScaleTicks('yon');
 
     % Create CLMS array and graph
-    CLMS=CLM(CLM(2:end,6)>0,:);
+    CLMS=CLM(2:end,6)>0;
     h(2)=figure;
-    scatter(CLMS(:,3), log(CLMS(:,4)), 'r*');
+    scatter(CLMS(:,3), log(CLM(:,4)), 'r*');
     xlabel('Duration');
     ylabel('IMI (log scale)');
     yt = get(gca, 'yTick');
@@ -38,7 +38,7 @@ for i = 1:dirlength
     zoomAdaptiveLogScaleTicks('yon');
 
     % Create PLMS10 array and graph
-    PLMS10=PLM10(PLM10(2:end,6)>0,:);
+    PLMS10=PLM10(2:end,6)>0;
     h(3)=figure;
     scatter(PLMS10(:,3), log(PLMS10(:,4)), 'b.');
     xlabel('Duration');
@@ -55,8 +55,8 @@ for i = 1:dirlength
     
     
     % Save workspaces and graphs, then clear and close all
-    %save([bigdirname '/batch/' patientID]);
-    savefig(h,[bigdirname '/graphs/' patientID]);
+%     save([bigdirname '/batch/' patientID]);
+    savefig([bigdirname '/graphs/' patientID 'CLM']);
 
     clearvars -except bigdir dirlength i bigdirname
     close all
