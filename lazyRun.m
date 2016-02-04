@@ -1,6 +1,6 @@
 
 function [CLM,PLM5,PLM10,epochStage] = lazyRun(StructName)
-addpath('C:\Users\Administrator\Documents\GitHub\MATPLM');
+% addpath('C:\Users\Administrator\Documents\GitHub\MATPLM');
 
 % Recommended initial conditions, particularly for batch processesing
 in = struct('fs',500,'maxdur',10,'minIMI',5,'maxIMI',90,'lb1',0.5,'ub1',0.5,...
