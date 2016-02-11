@@ -6,6 +6,9 @@ bigdirname = uigetdir; % prompt for file directory
 bigdir = dir([bigdirname '/*PAT*']); % load patient folders
 dirlength =  length(bigdir);
 
+% Initialize array for data
+data = cell(dirlength,15);
+
 % Begin loop to read files
 for i = 1:dirlength
     % Load the matlab variable
@@ -47,19 +50,31 @@ for i = 1:dirlength
     set(gca, 'YTickLabel', round(exp(yt)));
     zoomAdaptiveLogScaleTicks('yon');
 
+    % Create PLMS5 array
+    PLMS5=PLM5(PLM5(2:end,6)>0,:);
+    
     % Calculate other data
     TST = (30*sum(epochStage>0))/60;
     TRT = (30*size(epochStage,1))/60;
+    CLMhr = size(CLM,1)/TRT;
+    CLMShr = size(CLMS,1)/TST;
     PLM5hr = size(PLM5,1)/TRT;
+    PLMS5hr = size(PLMS5,1)/TST;
     PLM10hr = size(PLM10,1)/TRT;
+    PLMS10hr = size(PLMS10,1)/TST;
     
-    
-    % Save workspaces and graphs, then clear and close all
-    %save([bigdirname '/batch/' patientID]);
+    % Save workspaces, graphs, and data
+    % save([bigdirname '/lazyRunWorkspaces/' patientID]);
     savefig(h,[bigdirname '/graphs/' patientID]);
-
-    clearvars -except bigdir dirlength i bigdirname
+    data(i,1:end) = {patientID size(PLM5,1) PLM5hr size(PLMS5,1) PLMS5hr size(PLM10,1) PLM10hr size(PLMS10,1) PLMS10hr size(CLM,1) CLMhr size(CLMS,1) CLMShr TST TRT};
+    
+    % Clear and close all variables and graphs
+    clearvars -except bigdir dirlength i bigdirname data
     close all
     
 end % end for loop
+
+% Save data array
+save([bigdirname '/lazyRunWorkspaces/data'], 'data');
+
 end % end function
