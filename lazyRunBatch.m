@@ -8,6 +8,8 @@ dirlength =  length(bigdir);
 
 % Initialize array for data
 data = cell(dirlength,15);
+IMI = cell(dirlength,3);
+LMdata = cell(dirlength,3);
 
 % Begin loop to read files
 for i = 1:dirlength
@@ -67,14 +69,16 @@ for i = 1:dirlength
     % save([bigdirname '/lazyRunWorkspaces/' patientID]);
     savefig(h,[bigdirname '/graphs/' patientID]);
     data(i,1:end) = {patientID size(PLM5,1) PLM5hr size(PLMS5,1) PLMS5hr size(PLM10,1) PLM10hr size(PLMS10,1) PLMS10hr size(CLM,1) CLMhr size(CLMS,1) CLMShr TST TRT};
+    IMI(i,1:end) = {PLMS5(:,4) PLMS10(:,4) CLMS(:,4)};
+    LMdata(i,1:end) = {PLMS5 PLMS10 CLMS};
     
     % Clear and close all variables and graphs
-    clearvars -except bigdir dirlength i bigdirname data
+    clearvars -except bigdir dirlength i bigdirname data IMI LMdata
     close all
     
 end % end for loop
 
 % Save data array
-save([bigdirname '/lazyRunWorkspaces/data'], 'data');
+save([bigdirname '/lazyRunWorkspaces/data'], 'data', 'IMI', 'LMdata');
 
 end % end function

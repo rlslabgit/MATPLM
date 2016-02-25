@@ -1,4 +1,4 @@
-function createGraphs()
+function createScatters()
 
 % Load appropriate directories
 dirname = uigetdir; % prompt for file directory
@@ -16,7 +16,7 @@ set(gcf,'OuterPosition',pos);
 for i = 1:dirlength
     patientID = directory(i).name(1:11);
     row = str2num(patientID(4:6));
-    switch raw{(i+1),6}
+    switch raw{(i+1),5}
         case 'RA'
             col = 1;
         case 'O2'
