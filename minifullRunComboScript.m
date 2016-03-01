@@ -64,8 +64,12 @@ end;
 
 % If there are any NaNs in the record, filtering will fail. We must end the
 % record when a NaN is found
-if size(find(isnan(lEMG(sleepRecordStart:sleepRecordEnd)),1)) > 0, sleepRecordEnd = find(isnan(lEMG(sleepRecordStart:sleepRecordEnd)),1) - 1; end; 
-if size(find(isnan(rEMG(sleepRecordStart:sleepRecordEnd)),1)) > 0, sleepRecordEnd = find(isnan(rEMG(sleepRecordStart:sleepRecordEnd)),1) - 1; end; 
+if size(find(isnan(lEMG(sleepRecordStart:sleepRecordEnd)),1)) > 0 
+    sleepRecordEnd = find(isnan(lEMG(sleepRecordStart:sleepRecordEnd)),1) - 1; 
+end 
+if size(find(isnan(rEMG(sleepRecordStart:sleepRecordEnd)),1)) > 0 
+    sleepRecordEnd = find(isnan(rEMG(sleepRecordStart:sleepRecordEnd)),1) - 1; 
+end 
 
 % Generate filtered EMG data
 [ldsEMG] = filterAnddsEMG(in.hipass,in.lopass,in.fs,lEMG,sleepRecordStart,sleepRecordEnd);
