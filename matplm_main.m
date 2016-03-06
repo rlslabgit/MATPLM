@@ -1,83 +1,86 @@
-function [plm_outputs] = matplm_main(psg_struct)
+function [plm_outputs] = matplm_main(psg_struct,varargin)
+%% [plm_outputs] = matplm_main(psg_struct)
+% The main driving function for the MATPLM program. Input is the full
+% subject structure, transferred from EDF format with EDF
+% Conversion/Generic_Convert.m
+%
+% TODO: add support for one leg? Was thinking I would just make a separate
+% file for that
+sep_flag = 0;
 
-params = getInput; % store the parameters in a structure
+addpath('helper_functions')
+
+% TODO: Eventually, we'll run this file differently for seperate legs
+if strcmp('separate_legs',varargin)
+    display('MATPLM will calculate CLM/PLM for each leg seperately');
+    sep_flag = 1;
+end
+
+% Unless the user specifies 'default_params', ask for them.
+if strcmp('default_params',varargin)
+    params = getInput(0);
+else
+    params = getInput(1);
+end
 
 % find the LAT and RAT channels in the structure
 % TODO: support different channel naming styles
 lbls = extractfield(psg_struct.Signals,'label');
 lidx = find(not(cellfun('isempty', strfind(lbls,'Left'))));
 ridx = find(not(cellfun('isempty', strfind(lbls,'Right'))));
-lEMG = psg_struct.Signals(lidx).data;
-rEMG = psg_struct.Signals(ridx).data;
 
-% find start and end of the record and hypnogram vector
-% TODO: reasonable error handling (other file is too wordy)
-epochStage = StructName.CISRE_Hypnogram;
-sleepRecordStart = StructName.EDFStart2HypnoInSec * params.fs + 1;
-sleepRecordEnd = sleepRecordStart + size(epochStage, 1) * 30 * params.fs;
+lEMG = psg_struct.Signals(lidx(1)).data;
+rEMG = psg_struct.Signals(ridx(1)).data;
 
-% cannot be past edge of EMG
-if sleepRecordEnd >= max(size(rEMG,1),size(lEMG,1))
-    sleepRecordEnd = min(size(rEMG,1),size(lEMG,1)); 
+% find hypnogram/apnea/arousal vectors, start and stop times (in data
+% points) of the actual sleep scoring and the clock time start. The
+% hypnogram is expected to use standard 30 sec epochs.
+[epochStage,rec_start,rec_end,apnea_data,arousal_data,start_time] = ...
+    errcheck_ss(psg_struct,lEMG,rEMG,params.fs);
+
+% Truncate, filter and rectify EMG signals.
+lEMG = butter_rect(params,lEMG,rec_start,rec_end);
+rEMG = butter_rect(params,rEMG,rec_start,rec_end);
+
+% Apply dynamic threshold, if desired. Temporarily store the EMG in n*EMG
+% so that the dynamically adjusted data is not plotted.
+if params.dynthresh == 1
+    [nlEMG,~,lminT] = dynamicThresholdX(lEMG,params.fs);
+    [nrEMG,~,rminT] = dynamicThresholdX(rEMG,params.fs);
+else
+    % Store copy of EMG 
+    nlEMG = lEMG;
+    nrEMG = rEMG;
+    % Naively estimate low threshold
+    lminT = scanning2(lEMG,params.fs);
+    rminT = scanning2(rEMG,params.fs);
 end
 
-% If there are any NaNs in the record, filtering will fail. We must end the
-% record when a NaN is found
-if size(find(isnan(lEMG(sleepRecordStart:sleepRecordEnd)),1)) > 0 
-    sleepRecordEnd = find(isnan(lEMG(sleepRecordStart:sleepRecordEnd)),1) - 1; 
-end 
-if size(find(isnan(rEMG(sleepRecordStart:sleepRecordEnd)),1)) > 0 
-    sleepRecordEnd = find(isnan(rEMG(sleepRecordStart:sleepRecordEnd)),1) - 1; 
-end 
+% Find all leg movements on the left and right legs.
+min_below = 0.5; % time below low threshold to end movement
+min_above = 0.5; % time above low threshold to start movement
+% Also note the '+6' after *minT: the high threshold is traditionally 8
+% microvolts above the noise (or 6 above the low threshold)
+lLM = findIndices(nlEMG,lminT,lminT+6,min_below,min_above,params.fs);
+rLM = findIndices(nrEMG,rminT,rminT+6,min_below,min_above,params.fs);
 
+% optionally apply morphology criterion
+if params.morph == 1
+    lLM = cutLowMedian(lEMG,lLM,lminT,params.fs);
+    rLM = cutLowMedian(rdata,rLM,rminT,params.fs);    
 end
 
-% Display a dialog window that asks the user for several initial conditions
-% and parameters.
-function [in] = getInput()
-in = struct('fs',500,'maxdur',10,'minIMI',10,'maxIMI',90,'lb1',0.5,'ub1',0.5,...
-    'lb2',0.5,'ub2',0.5,'lopass',225,'hipass',25,'dynthresh',1,'morph',1);
-
-prompt = {'Sampling Rate:',...
-    'Max Movement Duration:'...
-    'Min IMI Duration:',...
-    'Max IMI Duration:',...
-    'Apnea lower-bound',...
-    'Apnea upper-bound',...
-    'Arousal lower-bound',...
-    'Arousal upper-bound',...
-    'Low-pass (hz):',...
-    'High-pass (hz):',...
-    'Dynamic threshold (0/1)',...
-    'Morphology Criterion (0/1)'};
-
-dlg_title = 'Parameters';
-numLines = 1;
-
-def = {'500',... % fs
-    '10',...     % max dur
-    '10',...      % min IMI
-    '90',...     % max IMI
-    '0.5',...    % lb ap
-    '0.5',...    % ub ap    
-    '0.5',...    % lb ar
-    '0.5',...    % ub ar
-    '225',...    % low pass
-    '25'...      % high pass
-    '1',...      % dynamic threshold
-    '1'};        % morphology criterion   
-    
-answer = inputdlg(prompt,dlg_title,numLines,def);
-valnames = fieldnames(in);
-
-for i = 1:size(valnames,1) % some extra-struct values I want 
-   in.(valnames{i}) = str2double(answer{i});
+% Here is where things diverge if the user specifies 'separate_legs'
+if sep_legs == 0
+    % calculate PLM candidates by combining the legs
+    CLM = combined_candidates(rLM,lLM,apnea_data,arousal_data,start_time,params);
+else
+    % get CLM from each leg seperately
+    lCLM = separate_candidates(lLM,apnea_data,arousal_data,start_time,params);
+    rCLM = separate_candidates(rLM,apnea_data,arousal_data,start_time,params);
 end
 
 end
 
-% perform simple error checking on epoch stage and sleep record start/end
-function [es,ss,se] = errcheck(es0,ss0,se0,LAT,RAT)
 
 
-end
