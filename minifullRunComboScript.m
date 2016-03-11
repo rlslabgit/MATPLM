@@ -214,7 +214,7 @@ TRT = size(epochStage,1)/2/60;
 
 % Write numerical outputs to a text file, and place in the subfolder
 % 'Patient Data Files.'
-fileID = fopen(['Patient Data Files/' patientID '.txt'],'w');
+fileID = fopen(['/' patientID '.txt'],'w');
 
 fprintf(fileID,'PatientID: %s\n',patientID);
 fprintf(fileID,'\nTotal Sleep Time: %.1f hrs\tTotal Recording Time: %.1f hrs\n',...
