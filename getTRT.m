@@ -3,7 +3,7 @@ function [ TRT, PLMSt ] = getTRT( epochStage, PLMt, fs )
 %   TRT = total rest time from epoch Stage, PLMSt = only extracting the
 %   rows from sleep in PLMt
 
-TRT = size(epochStage, 1) * 30 * fs;
+TRT = size(epochStage, 1) / 2;
 PLMSt = PLMt(PLMt(:,6) > 0, :);
 
 

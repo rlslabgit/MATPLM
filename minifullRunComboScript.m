@@ -122,8 +122,8 @@ end
 [PLMtnoAp] = minimasterPlanForPLMt(CLMnoAp,in.minIMI,in.fs,in.maxIMI,3,in.maxdur);
 
 % Write the results to a file in the Patient Data Files subfolder
-writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,doMed,inputname(1),...
-    CLM,CLMt);
+% writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,doMed,inputname(1),...
+%     CLM,CLMt);
 
 % Plot results, LM1 is left leg, LM2 is right leg, PLM is all PLMS in sleep
 % with IMI > minIMIDuration
