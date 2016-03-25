@@ -122,8 +122,8 @@ end
 [PLMtnoAp] = minimasterPlanForPLMt(CLMnoAp,in.minIMI,in.fs,in.maxIMI,3,in.maxdur);
 
 % Write the results to a file in the Patient Data Files subfolder
-writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,doMed,inputname(1),...
-    CLM,CLMt);
+% writeToFile(in,PLM,PLMnoAp,PLMt,PLMtnoAp,epochStage,doDynamic,doMed,inputname(1),...
+%     CLM,CLMt);
 
 % Plot results, LM1 is left leg, LM2 is right leg, PLM is all PLMS in sleep
 % with IMI > minIMIDuration
@@ -214,7 +214,7 @@ TRT = size(epochStage,1)/2/60;
 
 % Write numerical outputs to a text file, and place in the subfolder
 % 'Patient Data Files.'
-fileID = fopen(['Patient Data Files/' patientID '.txt'],'w');
+fileID = fopen(['/' patientID '.txt'],'w');
 
 fprintf(fileID,'PatientID: %s\n',patientID);
 fprintf(fileID,'\nTotal Sleep Time: %.1f hrs\tTotal Recording Time: %.1f hrs\n',...
