@@ -46,9 +46,7 @@ end
 
 % Combine left and right and sort.
 rLM(:,13) = 1; lLM(:,13) = 2;
-combLM = [rLM;lLM];
-combLM = sortrows(combLM,1);
-CLM = removeOverlap(combLM,fs);
+CLM = removeOverlap(lLM,rLM,fs);
 
 
 

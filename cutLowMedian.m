@@ -51,7 +51,7 @@ for i = 1:size(empty,1)
     % 1/100 second.
     while a < min && stop < initstop;
         a = med(start,stop);
-        start = start + fs/100; stop = start + fs/2;
+        start = round(start + fs/100); stop = round(start + fs/2);
     end
     
     % Mark the new median in the original array

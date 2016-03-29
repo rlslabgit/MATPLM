@@ -21,7 +21,7 @@ function [ndsEMG,threshes,minT,badEps] = dynamicThresholdX(dsEMG,fs)
 addpath('helper_functions')
 
 
-bigWindow = 15*fs; littleWindow = (0.1)*fs+1; 
+bigWindow = 15*fs; littleWindow = round((0.1)*fs+1); 
 
 threshes = zeros(floor(size(dsEMG,1)/bigWindow),1);
 badEps = []; % epoch numbers (in bigWindow epochs) of noisey signal

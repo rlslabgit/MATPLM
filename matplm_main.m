@@ -3,9 +3,6 @@ function [plm_outputs,lEMG,rEMG] = matplm_main(psg_struct,varargin)
 % The main driving function for the MATPLM program. Input is the full
 % subject structure, transferred from EDF format with EDF
 % Conversion/Generic_Convert.m
-%
-% TODO: add support for one leg? Was thinking I would just make a separate
-% file for that
 sep_flag = 0;
 plm_outputs = struct();
 
@@ -28,8 +25,8 @@ end
 % find the LAT and RAT channels in the structure
 % TODO: support different channel naming styles
 lbls = extractfield(psg_struct.Signals,'label');
-lidx = find(not(cellfun('isempty', strfind(lbls,'Left'))));
-ridx = find(not(cellfun('isempty', strfind(lbls,'Right'))));
+lidx = find(not(cellfun('isempty', strfind(lbls,'JbG'))));
+ridx = find(not(cellfun('isempty', strfind(lbls,'JbD'))));
 
 lEMG = psg_struct.Signals(lidx(1)).data;
 rEMG = psg_struct.Signals(ridx(1)).data;
