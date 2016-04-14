@@ -34,7 +34,7 @@ for i = 1:size(combLM(:,4),1)
             end
             
             % if more than max_num, just leave
-            if next_too >= max_num || 
+            if next_too >= max_num
                 continue
             end
         end

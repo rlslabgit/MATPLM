@@ -25,8 +25,8 @@ end
 % find the LAT and RAT channels in the structure
 % TODO: support different channel naming styles
 lbls = extractfield(psg_struct.Signals,'label');
-lidx = find(not(cellfun('isempty', strfind(lbls,'JbG'))));
-ridx = find(not(cellfun('isempty', strfind(lbls,'JbD'))));
+lidx = find(not(cellfun('isempty', strfind(lbls,'Left'))));
+ridx = find(not(cellfun('isempty', strfind(lbls,'Right'))));
 
 lEMG = psg_struct.Signals(lidx(1)).data;
 rEMG = psg_struct.Signals(ridx(1)).data;

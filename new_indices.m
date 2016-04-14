@@ -11,7 +11,10 @@ LM = [];
 window_size = fs * 30;  % try a five second sliding window
 step_size = floor(fs/2);  % how far will our window step?
 
+% turn off peak warning, it just means there are no peaks in this epoch
+warning('off','signal:findpeaks:largeMinPeakHeight')
 
+% windowing can be greatly sped up, but don't worry for now...
 for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
     interest = EMG(n*window_size+1:(n+1)*window_size,1);
     interstk = EKG(n*window_size+1:(n+1)*window_size,1);
@@ -51,10 +54,11 @@ for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
     % adjust start times to this window
     lm_here(:,1) = lm_here(:,1) + n*window_size+1;
     lm_here(:,2) = lm_here(:,2) + n*window_size+1;      
-    
-    
+        
     LM = [LM ; lm_here];                  
 end
+
+warning('on','signal:findpeaks:largeMinPeakHeight') % turn back on
 
 % TODO: remove identical or overlapping
 LM = check_edges(LM, min_low, fs);
