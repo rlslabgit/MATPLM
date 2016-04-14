@@ -9,7 +9,7 @@ function [ndsEMG,threshes,minT,badEps] = dynamicThresholdX(dsEMG,fs)
 % which the most values lie below that value is regarded as the baseline,
 % and the bigWindow is normalized using the factor minT/baseline.
 %
-% Inputs: 
+% Inputs:
 %   dsEMG - filtered and rectified EMG signal
 %   fs - sampling rate
 %
@@ -21,7 +21,7 @@ function [ndsEMG,threshes,minT,badEps] = dynamicThresholdX(dsEMG,fs)
 addpath('helper_functions')
 
 
-bigWindow = 15*fs; littleWindow = round((0.1)*fs+1); 
+bigWindow = 15*fs; littleWindow = round((0.1)*fs)+1;
 
 threshes = zeros(floor(size(dsEMG,1)/bigWindow),1);
 badEps = []; % epoch numbers (in bigWindow epochs) of noisey signal
@@ -32,7 +32,7 @@ ndsEMG = dsEMG * 0;
 % of the central 1/2 second long window
 s = movingstd(dsEMG,littleWindow,'central')*5;
 dsEMG(:,2) = smooth(dsEMG(:,1),littleWindow) + s;
-clear s; 
+clear s;
 
 % Let's try rounding this for now, it's easier than binning.
 % dsEMG(:,2) = round(dsEMG(:,2));
@@ -43,35 +43,40 @@ clear s;
 
 
 % Loop through bigWindows
-for n = 0:(floor(size(dsEMG,1)/bigWindow)-1)        
+for n = 0:(floor(size(dsEMG,1)/bigWindow)-1)
     % Calculate baseline of this bigWindow and save for later adjustment
     % The hard-coded 2 means don't set a baseline less than 2
-    threshes(n+1) = scanning3(dsEMG(n*bigWindow+1:(n+1)*bigWindow,:),2); 
+    
+    threshes(n+1) = scanning3(dsEMG(n*bigWindow+1:(n+1)*bigWindow,:),2);    
 end
 
 % Instead of first epoch, try the mode?
 minT = mode(threshes);
-threshes(threshes < minT) = minT;
+% not sure if we should scale up...
+% threshes(threshes < minT) = minT;
+threshes(threshes == 0) = minT;
 
 
 % Apply scaling factor to each section of the dsEMG
 
 for i = 1:size(threshes,1)-1
     % NEW STANDARDS (if > 16 above noise, ignore)
-    if threshes(i) > (minT + 16)
-        ndsEMG(bigWindow*(i-1)+1:bigWindow*i,1) = ...
-            ones(size(bigWindow*(i-1)+1:bigWindow*i,2),1) * minT;
-        threshes(i) = -1; % mark this a bad epoch
-        badEps = [badEps ; i]; %#ok<AGROW>
-    else
-        ndsEMG(bigWindow*(i-1)+1:bigWindow*i)...
-            = dsEMG(bigWindow*(i-1)+1:bigWindow*i) * minT / threshes(i);
-    end
+    %     if threshes(i) > (minT + 16)
+    %         ndsEMG(bigWindow*(i-1)+1:bigWindow*i,1) = ...
+    %             ones(size(bigWindow*(i-1)+1:bigWindow*i,2),1) * minT;
+    %         threshes(i) = -1; % mark this a bad epoch
+    %         badEps = [badEps ; i]; %#ok<AGROW>
+    %     else
+    %         ndsEMG(bigWindow*(i-1)+1:bigWindow*i)...
+    %             = dsEMG(bigWindow*(i-1)+1:bigWindow*i) * minT / threshes(i);
+    %     end
+    ndsEMG(bigWindow*(i-1)+1:bigWindow*i)...
+        = dsEMG(bigWindow*(i-1)+1:bigWindow*i) * minT / threshes(i);
 end
 
 ndsEMG(size(threshes,1)*bigWindow:end)...
-        = dsEMG(size(threshes,1)*bigWindow:end,1) * minT / threshes(end);
-        
+    = dsEMG(size(threshes,1)*bigWindow:end,1) * minT / threshes(end);
+
 
 end
 
@@ -84,7 +89,7 @@ function baseline = scanning3(dsEMG,minT)
 % The ol' histogram try
 % g = histc(h,0:2:300);
 % [~,b] = max(g);
-% 
+%
 % if b > minT
 %     baseline = mode(h);
 %     baseline = b;
@@ -113,4 +118,4 @@ else
 end
 
 end
-   
+
