@@ -30,6 +30,7 @@ ridx = find(not(cellfun('isempty', strfind(lbls,'JbD'))));
 
 lEMG = psg_struct.Signals(lidx(1)).data;
 rEMG = psg_struct.Signals(ridx(1)).data;
+params.fs = psg_struct.Signals(ridx(1)).frq;
 
 % find hypnogram/apnea/arousal vectors, start and stop times (in data
 % points) of the actual sleep scoring and the clock time start. The
