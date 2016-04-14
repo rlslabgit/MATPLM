@@ -11,12 +11,12 @@ function [fullRuns] = findIndices(data,lowThreshold,highThreshold,minLowDuration
     highValues = find(data > highThreshold);
     if size(highValues,1) < 1
         fullRuns(1,1) = 0;                  %ends function if no highvalues detected 
-        fullRuns(1,2) = 0                   %sets array with runs to  0  0               
+        fullRuns(1,2) = 0;                   %sets array with runs to  0  0               
         return;
     end
     if size(lowValues,1) < 1
         fullRuns(1,1) = 1;                  %ends function if not lowValues detected
-        fullRuns(1,2) = 0                   % sets array with runs to 1  0
+        fullRuns(1,2) = 0;                   % sets array with runs to 1  0
         return;
     end 
 
