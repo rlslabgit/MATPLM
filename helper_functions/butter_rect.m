@@ -1,4 +1,4 @@
-function dsEMG = butter_rect(pars,EMG,ss,se)
+function dsEMG = butter_rect(pars,EMG,ss,se,varargin)
 %% dsEMG = butter_rect(pars,fs,EMG)
 % Apply low and high pass, 5th order butterworth bandpass filters. Also
 % truncate to start and end of record and rectify.
@@ -7,6 +7,10 @@ function dsEMG = butter_rect(pars,EMG,ss,se)
 [d,c] = butter(5,pars.lopass/pars.fs,'low');
 dsEMG = filtfilt(b,a,EMG(ss:se,1));
 dsEMG = filtfilt(d,c,dsEMG);
-dsEMG = abs(dsEMG);
+
+if ~strcmp('noabs',varargin)
+    dsEMG = abs(dsEMG);    
+end
+
 
 end
