@@ -13,7 +13,7 @@ function [EKGless, peaks] = removeEKG(dsEMG,dsEKG,fs)
 
 
 EKGless = dsEMG(:,1);
-r_point = 200000; % attempt at finding r wave
+r_point = 20000; % attempt at finding r wave
 
 % Mark where EKG passes above some threshold (want to avoid s wave)
 r_edges = (dsEKG(:,1).^2 > r_point);
@@ -33,8 +33,8 @@ a(end,3) = beats(end,1);
 %%
 peaks = zeros(size(a,1)-2,3);
 
-frontbuff = fs/5;
-backbuff = fs/5;
+frontbuff = fs/10;
+backbuff = fs/10;
 
 % ignore first and last, causes too many problems
 for i = 2:size(a,1)-1
@@ -50,10 +50,10 @@ for i = 2:size(a,1)-1
         EKGless(mid:mid+backbuff) = dsEMG(mid+backbuff:mid+2*backbuff);
     end
     
-    peaks(i-1,1) = mid; % location of peak
-    peaks(i-1,2) = dsEKG(mid,1); % remember: EKG is squared
-    peaks(i-1,3) = dsEMG(mid,1) > mean(dsEMG(mid-2*frontbuff:mid-frontbuff,1))...
-        + 5 * std(dsEMG(mid-2*frontbuff:mid-frontbuff,1));
+%     peaks(i-1,1) = mid; % location of peak
+%     peaks(i-1,2) = dsEKG(mid,1); % remember: EKG is squared
+%     peaks(i-1,3) = dsEMG(mid,1) > mean(dsEMG(mid-2*frontbuff:mid-frontbuff,1))...
+%         + 5 * std(dsEMG(mid-2*frontbuff:mid-frontbuff,1));
 end
 
 end
