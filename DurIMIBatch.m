@@ -14,6 +14,8 @@ data(1,8) = {'CLMIMIs<10'};
 data(1,9) = {'CLMIMIs<10/hr'};
 data(1,10) = {'CLMw/hr'};
 data(1,11) = {'CLMs/hr'};
+data(1,12) = {'TST (min)'};
+data(1,13) = {'TRT (min)'};
 
 
 for i=1:dirlength
@@ -33,6 +35,8 @@ for i=1:dirlength
     data(i+1,9) = {size(CLMS(CLMS(:,4)<10,4),1)/TST*60};
     data(i+1,10) = {size(CLMW,1)/TWT*60};
     data(i+1,11) = {size(CLMS,1)/TST*60};
+    data(i+1,12) = {TST};
+    data(i+1,13) = {TST};
 end
 
 clearvars -except data
