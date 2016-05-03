@@ -47,7 +47,7 @@ for n = 0:(floor(size(dsEMG,1)/bigWindow)-1)
     % Calculate baseline of this bigWindow and save for later adjustment
     % The hard-coded 2 means don't set a baseline less than 2
     
-    threshes(n+1) = scanning3(dsEMG(n*bigWindow+1:(n+1)*bigWindow,:),2);    
+    threshes(n+1) = scanning3(dsEMG(n*bigWindow+1:(n+1)*bigWindow,1),fs);    
 end
 
 % Instead of first epoch, try the mode?
@@ -82,40 +82,24 @@ end
 
 
 % Find the baseline of a bigWindow epoch
-function baseline = scanning3(dsEMG,minT)
+function baseline = scanning3(dsEMG,fs)
 
-% h = dsEMG(dsEMG(:,2) > dsEMG(:,1),2);
+lit_window = round((0.3)*fs)+1;
 
-% The ol' histogram try
-% g = histc(h,0:2:300);
-% [~,b] = max(g);
-%
-% if b > minT
-%     baseline = mode(h);
-%     baseline = b;
-% else
-%     baseline = minT;
-% end
+s = movingstd(dsEMG,lit_window,'central')*5;
+dsEMG(:,2) = smooth(dsEMG(:,1),lit_window) + s;
 
-% Rounded mode
-% baseline = mode(h);
-
-% Longest run
-tol = 2;
-ds = abs(diff(dsEMG(:,2)));
-ds = ds < tol;
-
-A = findseq(+ds);
-if isempty(A) %|| max(A(:,4),1) == 0 % seen when device unplugged. Ignore this section
-    baseline = minT + 100;
-else
-    indx = find(A(:,4) == max(A(:,4)));
-    baseline = floor(median(dsEMG(A(indx,2)+1:A(indx,3),2)));
-    if baseline < minT
-        baseline = minT;
-    end
-    % baseline = A(find(A(:,4) == max(A(:,4)),1));
+baseline = 1;
+cur_size = 0;
+for i = 1:100
+   in_here = dsEMG(dsEMG(:,2) > i & dsEMG(:,2) < (i + 1),2);
+   if size(in_here,1) > cur_size
+       cur_size = size(in_here,1);
+       baseline = max(in_here);
+   end
 end
+
+baseline = ceil(baseline);
 
 end
 

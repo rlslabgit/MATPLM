@@ -19,7 +19,7 @@ tic
 
 % ProtocolDIR is the path to the directory containing the subject folders.
 % Must end in '/'
-ProtocolDIR = 'Y:/COPD data/';                   %
+ProtocolDIR = 'Y:/Misc subjects/';                   %
 modDateAfter = '13-Jan-2016 5:03:00'; %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

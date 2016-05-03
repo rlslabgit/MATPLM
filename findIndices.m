@@ -25,6 +25,15 @@ function [fullRuns] = findIndices(data,lowThreshold,highThreshold,minLowDuration
 
     numHighRuns = 0;
     searchIndex = highValues(1);
+    % so, if the only high value is the last point in this section, there
+    % will be an error. We should check this special case, and in general
+    % improve this program's usability with bad data
+    if searchIndex == size(data,1)
+        fullRuns = [0 0];
+        return
+    end
+    
+    
     while (searchIndex < size(data,1))
         numHighRuns = numHighRuns + 1;
         [distToNextLowRun,lengthOfNextLowRun] = calcDistToRun(lowRuns,searchIndex);

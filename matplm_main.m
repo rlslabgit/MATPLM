@@ -49,7 +49,7 @@ if params.dynthresh == 1
     [nlEMG,~,lminT] = dynamicThresholdX(lEMG,params.fs);
     [nrEMG,~,rminT] = dynamicThresholdX(rEMG,params.fs);
 else
-    % Store copy of EMG 
+    % Store copy of EMG
     nlEMG = lEMG;
     nrEMG = rEMG;
     % Naively estimate low threshold
@@ -70,7 +70,7 @@ rLM = findIndices(nrEMG,rminT,rminT+6,min_below,min_above,params.fs);
 if params.morph == 1
     plm_outputs.morphology_criterion = 'True';
     lLM = cutLowMedian(lEMG,lLM,lminT,params.fs);
-    rLM = cutLowMedian(rEMG,rLM,rminT,params.fs);    
+    rLM = cutLowMedian(rEMG,rLM,rminT,params.fs);
 end
 
 % we always want these in the output array
@@ -83,15 +83,22 @@ plm_outputs.rLM = rLM;
 if sep_flag == 0
     % calculate PLM candidates by combining the legs
     CLM = combined_candidates(rLM,lLM,epochStage,apnea_data,arousal_data,start_time,params);
-    [PLM,~] = periodic_lms(CLM,params);
-    [~,ia,~] = intersect(CLM(:,1),PLM(:,1));
-    CLM(ia,5) = 1; % go back and mark PLM in CLM
     
-    % store output vectors in struct
-    plm_outputs.CLM = CLM;
-    plm_outputs.PLM = PLM;
-    plm_outputs.PLMS = PLM(PLM(:,6) > 0,:);
-    plm_outputs.CLMS = CLM(CLM(:,6) > 0,:);
+    if ~isempty(CLM)
+        [PLM,~] = periodic_lms(CLM,params);
+        [~,ia,~] = intersect(CLM(:,1),PLM(:,1));
+        CLM(ia,5) = 1; % go back and mark PLM in CLM
+        
+        % store output vectors in struct
+        plm_outputs.CLM = CLM;
+        plm_outputs.PLM = PLM;
+        plm_outputs.PLMS = PLM(PLM(:,6) > 0,:);
+        plm_outputs.CLMS = CLM(CLM(:,6) > 0,:);
+    else
+        display('No CLM found!')
+    end
+    
+    
 else
     % get CLM from each leg seperately
     lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
@@ -99,9 +106,9 @@ else
     
     [lPLM,~] = periodic_lms(lCLM,params);
     [~,ia,~] = intersect(lCLM(:,1),lPLM(:,1));
-    lCLM(ia,5) = 1; 
+    lCLM(ia,5) = 1;
     [rPLM,~] = periodic_lms(rCLM,params);
-    [~,ia,~] = intersect(rCLM(:,1),rPLM(:,1));    
+    [~,ia,~] = intersect(rCLM(:,1),rPLM(:,1));
     rCLM(ia,5) = 1;
     
     % store output vectors in struct

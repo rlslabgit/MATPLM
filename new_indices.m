@@ -9,12 +9,13 @@ EMG = abs(oEMG); %
 LM = [];
 
 window_size = fs * 30;  % try a five second sliding window
-step_size = floor(fs/2);  % how far will our window step?
+
 
 % turn off peak warning, it just means there are no peaks in this epoch
 warning('off','signal:findpeaks:largeMinPeakHeight')
 
 % windowing can be greatly sped up, but don't worry for now...
+% ok, so what are we going to do about the edges of the windows?
 for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
     interest = EMG(n*window_size+1:(n+1)*window_size,1);
     interstk = EKG(n*window_size+1:(n+1)*window_size,1);

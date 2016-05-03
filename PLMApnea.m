@@ -5,10 +5,9 @@ function [newPLM]=PLMApnea(PLM,ApneaData,HypnogramStart,lb,ub,fs)
 
 %% Form newAp, which is ApneaData with endpoint of event (in datapoints) added to 4th col
 % This is calculated with HypnogramStart as datapoint 1
-if size(ApneaData,1) == 0 || ApneaData{1,1} == 0
-    [nrowsPLM,ncolsPLM]=size(PLM);
+if size(ApneaData,1) == 0 || sum(ApneaData{1,1}) == 0
     newPLM=PLM;
-    newPLM(1,11)=0;
+    newPLM(:,11)=0;
     return
 end
 
