@@ -24,7 +24,12 @@ if ~isempty(CLM)
     CLM(:,9) = CLM(:,4) > params.maxIMI | CLM(:,3) > params.maxdur;
     aftLong = find(CLM(:,3) > params.maxdur) + 1;
     aftLong = aftLong(aftLong < size(CLM,1));
-    CLM(aftLong,9) = 1;         
+    CLM(aftLong,9) = 1;
+    
+    % add breakpoints if IMI < minIMI. This is according to new standards
+    if params.inlm
+        CLM(CLM(:,4) < params.minIMI, 9) = 1;   
+    end
     
     % The area of the leg movement should go here. However, it is not
     % currently well defined in the literature for combined legs, and we
@@ -89,7 +94,9 @@ for i = 1:size(combLM(:,4),1)
 end
 
 % move the leg indicator to the 13th column (out of the way of other values
-CLM(:,13) = CLM(:,3); CLM(:,3) = 0;
+if ~isempty(CLM)
+    CLM(:,13) = CLM(:,3); CLM(:,3) = 0;
+end
 
 end
 
