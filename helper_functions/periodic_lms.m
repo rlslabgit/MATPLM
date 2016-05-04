@@ -11,6 +11,8 @@ function [PLMt,CLMt] = periodic_lms(CLM,params)
 % too short
 if ~params.inlm
     CLMt = removeShortIMI(CLM,params.minIMI,params.fs);
+else
+    CLMt = CLM;
 end
         
 CLMt(:,5) = 0; CLMt(:,9) = 0; % Restart PLM and Breakpoints

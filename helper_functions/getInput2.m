@@ -7,7 +7,7 @@ function [in] = getInput2(fs, ask)
 if ~ask
     in = struct('fs',fs,'maxdur',10,'minIMI',10,'maxIMI',90,'lb1',0.5,'ub1',0.5,...
     'lb2',0.5,'ub2',0.5,'lopass',round(fs/2) - 25,'hipass',25,'thresh',true,...
-    'ekg',true,'inlm',true);
+    'ekg',true,'inlm',true,'minNumIMI',3);
 else
 
 Title = 'MATPLM Parameters';
@@ -34,7 +34,7 @@ Prompt(end+1,:) = {'Low Pass filter', 'lopass','hz'};
 Formats(1,2).type = 'edit';
 Formats(1,2).format = 'integer';
 %Formats(1,2).size = 80;
-DefAns.lopass = round(fs/2) - 25; % i.e. 225 at 500 hz
+DefAns.lopass = round(fs*0.45); % i.e. 225 at 500 hz
 
 Prompt(end+1,:) = {'High Pass filter', 'hipass','hz'};
 Formats(1,3).type = 'edit';
@@ -77,6 +77,12 @@ Formats(3,3).type = 'check';
 DefAns.thresh = true;
 
 [in,~] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
+
+in.lb1 = 0.5;
+in.ub1 = 0.5;
+in.lb2 = 0.5;
+in.ub2 = 0.5;
+in.minNumIMI = 3;
 end
 
 end
