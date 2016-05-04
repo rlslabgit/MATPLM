@@ -15,12 +15,6 @@ if strcmp('separate_legs',varargin)
     sep_flag = 1;
 end
 
-% Unless the user specifies 'default_params', ask for them.
-if strcmp('default_params',varargin)
-    params = getInput(0);
-else
-    params = getInput(1);
-end
 
 %% Extract necessary data from structure
 % find the LAT and RAT channels in the structure
@@ -35,7 +29,12 @@ rEMG = psg_struct.Signals(ridx(1)).data;
 EKG = psg_struct.Signals(kidx(1)).data;
 
 % automatically gets sampling rate, as long as it is recorded in the .EDF
-params.fs = psg_struct.Signals(ridx(1)).frq;
+% Unless the user specifies 'default_params', ask for them.
+if strcmp('default_params',varargin)
+    params = getInput2(psg_struct.Signals(ridx(1)).frq,false);
+else
+    params = getInput2(psg_struct.Signals(ridx(1)).frq,true);
+end
 
 % find hypnogram/apnea/arousal vectors, start and stop times (in data
 % points) of the actual sleep scoring and the clock time start. The
