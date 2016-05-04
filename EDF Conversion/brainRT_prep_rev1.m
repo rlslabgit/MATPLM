@@ -1,6 +1,10 @@
-function [EDF_sup] = brainRT_prep_rev1(all_events)
+function [EDF_sup] = brainRT_prep_rev1(all_events,filepath)
 %% [EDF_sup] = brainRT_prep(all_events)
-[EDF_sup] = EDF_read_jhmi_rev_101(); % open window to pick file
+% Convert Imad Ghorayeb's files from BrainRT to Matlab. Notice this is very
+% specific to his format, because it relies on the particular codes for
+% events.
+
+[EDF_sup] = EDF_read_jhmi_rev_101(filepath); % open window to pick file
 
 % trim off all the unneeded channels so it doesn't take 10 mins to load
 i = 1;
@@ -91,6 +95,31 @@ if isempty(arousals)
     EDF_sup.CISRE_Arousal = num2cell(zeros(1,3));
 else
     EDF_sup.CISRE_Arousal = arousals(:,1:3);
+end
+
+% Add apnea data to the structure. We only care about 129-3 and 129-2,
+% which are the codes for obstructive/central apnea (ignore hypopnea I
+% think)
+apneas = all_events(codes == 129,:);
+apneas = apneas(cell2mat(apneas(:,2)) == 2 | cell2mat(apneas(:,2)) == 3,:);
+
+for i = 1:size(apneas,1)
+    apneas{i,1} = apneas{i,4};
+    
+    if apneas{i,2} == 3
+        apneas{i,2} = 'APNEA-OBSTRUCTIVE';
+    else
+        apneas{i,2} = 'APNEA-CENTRAL';
+    end
+    apneas{i,3} = etime(datevec(apneas{i,5},formatIn),...
+        datevec(apneas{i,4},formatIn));
+    apneas{i,1}(11) = ' '; % remove T
+end
+
+if isempty(apneas)
+    EDF_sup.CISRE_Apnea = num2cell(zeros(1,3));
+else
+    EDF_sup.CISRE_Apnea = apneas(:,1:3);
 end
 
 end
