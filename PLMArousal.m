@@ -47,7 +47,8 @@ for ii=1:nrowsAr
                     newPLM(jj,12)=8;
                 case 'AROUSAL-SNORE'
                     newPLM(jj,12)=9;
-      
+                otherwise
+                    newPLM(jj,12) = 0;
             end
         end
     end

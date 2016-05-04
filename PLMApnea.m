@@ -52,6 +52,8 @@ for ii=1:nrowsAp
                     newPLM(jj,11)=11;
                 case 'SNORE'
                     newPLM(jj,11)=12;
+                otherwise
+                    newPLM(jj,11) = 0;
             end
         end
     end
