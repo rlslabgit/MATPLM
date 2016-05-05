@@ -2,8 +2,10 @@ function [EDF_sup] = brainRT_prep_rev1(all_events,filepath)
 %% [EDF_sup] = brainRT_prep(all_events)
 % Convert Imad Ghorayeb's files from BrainRT to Matlab. Notice this is very
 % specific to his format, because it relies on the particular codes for
-% events.
+% events. Everything in apnea/arousal arrays is a string. Hypnogram should
+% be in the form 'yyyy-mm-dd HH:MM:SS.FFF' when finished.
 
+% [EDF_sup] = EDF_read_jhmi_rev_101(); % open window to pick file
 [EDF_sup] = EDF_read_jhmi_rev_101(filepath); % open window to pick file
 
 % trim off all the unneeded channels so it doesn't take 10 mins to load
@@ -66,6 +68,7 @@ for i = 1:size(hypnogram,1)
 end
 
 EDF_sup.CISRE_HypnogramStart = hypnogram_start;
+EDF_sup.CISRE_HypnogramStart(11) = ' '; % get rid of the T
 EDF_sup.CISRE_Hypnogram = simp_hyp;
 
 % Now we add things like times
@@ -86,8 +89,8 @@ arousals = all_events(codes == 135,:);
 for i = 1:size(arousals,1)
     arousals{i,1} = arousals{i,4};
     arousals{i,2} = 'AROUSAL';
-    arousals{i,3} = etime(datevec(arousals{i,5},formatIn),...
-        datevec(arousals{i,4},formatIn));
+    arousals{i,3} = num2str(etime(datevec(arousals{i,5},formatIn),...
+        datevec(arousals{i,4},formatIn)));
     arousals{i,1}(11) = ' '; % remove T
 end
 
@@ -111,8 +114,8 @@ for i = 1:size(apneas,1)
     else
         apneas{i,2} = 'APNEA-CENTRAL';
     end
-    apneas{i,3} = etime(datevec(apneas{i,5},formatIn),...
-        datevec(apneas{i,4},formatIn));
+    apneas{i,3} = num2str(etime(datevec(apneas{i,5},formatIn),...
+        datevec(apneas{i,4},formatIn)));
     apneas{i,1}(11) = ' '; % remove T
 end
 

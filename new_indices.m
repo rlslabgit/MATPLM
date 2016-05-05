@@ -2,13 +2,20 @@ function LM = new_indices(oEMG, EKG, fs)
 %% LM = new_indices(oEMG, fs)
 % remember, this takes filtered, unrectified EMG...
 
+% min_high = minimum time without falling below low threshold to signal
+% start of movement
+% min_low = minimum time without rising above low threshold to signal end
+% of movement.
+%
+% I don't know why you would want to change these values, so they are not
+% listed as parameters in the initial dialog. You can change them here.
 min_high = 0.5;
 min_low = 0.5;
 
 EMG = abs(oEMG); %
 LM = [];
 
-window_size = fs * 30;  % try a five second sliding window
+window_size = fs * 30;  % try a 30 second sliding window
 
 
 % turn off peak warning, it just means there are no peaks in this epoch
@@ -17,13 +24,29 @@ warning('off','signal:findpeaks:largeMinPeakHeight')
 % windowing can be greatly sped up, but don't worry for now...
 % ok, so what are we going to do about the edges of the windows?
 for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
-    interest = EMG(n*window_size+1:(n+1)*window_size,1);
-    interstk = EKG(n*window_size+1:(n+1)*window_size,1);
+    cur_start = n*window_size+1; cur_end = (n+1)*window_size;
+    
+    
+    interest = EMG(cur_start:cur_end,1);
+    interstk = EKG(cur_start:cur_end,1);
     bl = findbl(interest,fs);
     
     lowt = bl + 2; % low threshold is two above baseline
     hit = lowt + 6; % this really should be variable
     
+    % check for activity near right edge of window, possibly extend the
+    % critical period. We will extend the window by 1 second: this is
+    % greater than the minimum duration for an LM. May need some
+    % experimentation
+    if ~isempty(find(interest(end-round(fs/2):end) >= hit,1));
+        if cur_end + fs <= size(EMG,1)
+            cur_end = cur_end + fs;
+        end
+        
+        interest = EMG(cur_start:cur_end,1);
+        interstk = EKG(cur_start:cur_end,1);
+    end
+              
     % check for EKG??
     [~, rel] = findpeaks(interest.^2,'MinPeakHeight',hit.^2,...
         'MinPeakDistance',0.150*500);
@@ -31,12 +54,10 @@ for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
     beats = rel(:,2) > 0.7 & rel(:,2) < 1.2;
     
     if size(rel,1) > 30 && sum(beats)/size(rel,1) > 0.3
-        plot(interest)
         interest = removeEKG(interest,interstk,fs);
         bl = findbl(interest,fs);
         lowt = bl + 2; % low threshold is two above baseline
         hit = lowt + 6; % this really should be variable
-        plot(interest)
     end
     
     
@@ -53,8 +74,8 @@ for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
     lm_here = cutLowMedian(interest,lm_here,lowt-2,fs);
     
     % adjust start times to this window
-    lm_here(:,1) = lm_here(:,1) + n*window_size+1;
-    lm_here(:,2) = lm_here(:,2) + n*window_size+1;      
+    lm_here(:,1) = lm_here(:,1) + cur_start;
+    lm_here(:,2) = lm_here(:,2) + cur_start;      
         
     LM = [LM ; lm_here];                  
 end
@@ -72,7 +93,6 @@ function LM = check_edges(fLM, min_low, fs)
 
 % first, sort by start time
 LM = sortrows(fLM);
-%LM = getIMI(LM, fs);
 LM(2:end,4) = (LM(2:end,1) - LM(1:end-1,2))/fs;
 LM(1,4) = 9999;
 
@@ -86,7 +106,6 @@ while sum(LM(:,4) < min_low) > 0
     LM(negs(:,1),2) = max(negs(:,2),negs(:,3));
     LM = LM(LM(:,4) > 0.5,:);    
     LM(2:end,4) = (LM(2:end,1) - LM(1:end-1,2))/fs;
-    display('one loop');
 end
 
 end

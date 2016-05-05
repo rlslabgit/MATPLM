@@ -51,8 +51,6 @@ EKG = butter_rect(struct('hipass',0.5,'lopass',40,'fs',500),EKG,rec_start,rec_en
 
 %% Calculate leg movements for each leg channel
 % Find all leg movements on the left and right legs.
-min_below = 0.5; % time below low threshold to end movement
-min_above = 0.5; % time above low threshold to start movement
 
 % Also note the '+6' after *minT: the high threshold is traditionally 8
 % microvolts above the noise (or 6 above the low threshold)
