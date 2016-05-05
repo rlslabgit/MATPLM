@@ -15,30 +15,15 @@ if ~isempty(CLM)
     % (col 8)
     CLM (:,7) = CLM(:,1)/(params.fs * 60);
     CLM (:,8) = round (CLM (:,7) * 2 + 0.5);
-        
-    % Mark movements (col 9) with breakpoints if they are preceeded by an
-    % IMI > max allowable duration or have too long movement durations. There
-    % also must be a breakpoint after a too long movement, so that a PLM run
-    % does not begin on a movement > maxdur.
-    % TODO: add breakpoints for intervening LM
-    CLM(:,9) = CLM(:,4) > params.maxIMI | CLM(:,3) > params.maxdur;
-    aftLong = find(CLM(:,3) > params.maxdur) + 1;
-    aftLong = aftLong(aftLong < size(CLM,1));
-    CLM(aftLong,9) = 1;
-    
-    % add breakpoints if IMI < minIMI. This is according to new standards
-    if params.inlm
-        CLM(CLM(:,4) < params.minIMI, 9) = 1;   
-    end
-    
+
     % The area of the leg movement should go here. However, it is not
     % currently well defined in the literature for combined legs, and we
     % have omitted it temporarily
     CLM(:,10) = 0;
                
     % Add apnea events (col 11) and arousal events (col 12)
-    CLM = PLMApnea(CLM,apd,hgs,params.lb1,params.ub1,params.fs);
-    CLM = PLMArousal(CLM,ard,hgs,params.lb2,params.ub2,params.fs);
+    CLM = PLMApnea_rev2(CLM,apd,hgs,params.lb1,params.ub1,params.fs);
+    CLM = PLMArousal_rev2(CLM,ard,hgs,params.lb2,params.ub2,params.fs);
 end
 
 end
@@ -97,74 +82,5 @@ end
 if ~isempty(CLM)
     CLM(:,13) = CLM(:,3); CLM(:,3) = 0;
 end
-
-end
-
-
-
-% Old remove-overlap function, should be deleted
-function [filteredLM] = rOV2(combinedLM,fs)
-
-% First and second movement indeces.
-i = 1;
-j = 2;
-
-% Index in new array.
-newIdx = 1;
-
-% Instantiate an array that is the size of the total combined LM.
-arrLength = size(combinedLM,1);
-filteredLM = zeros(arrLength,size(combinedLM,2));
-
-while (i < arrLength)
-    % Isolated movement with no overlap.
-    if (combinedLM(i,2) < (combinedLM(j,1) - fs/2))
-        filteredLM(newIdx,1) = combinedLM(i,1);
-        filteredLM(newIdx,2) = combinedLM(i,2);
-        filteredLM(newIdx,13) = combinedLM(i,13);
-        i = i+1;
-        j = j+1;
-        newIdx = newIdx + 1;
-        % Movement begins on one leg and continues on the other.
-    elseif (combinedLM(i,2) > (combinedLM(j,1) - fs/2) && combinedLM(i,2) < combinedLM(j,2))
-        filteredLM(newIdx,1) = combinedLM(i,1);
-        
-        while (combinedLM(i,2) > (combinedLM(j,1) - fs/2) && j < arrLength)
-            i = i + 1; j = j + 1;
-        end
-        
-        filteredLM(newIdx,2) = combinedLM(i,2);
-        filteredLM(newIdx,13) = 3;
-        i = i+1;
-        j = j+1;
-        newIdx = newIdx + 1;
-        % Strange case where movements end at same time...
-    elseif (combinedLM(i,2) == combinedLM(j,2))
-        filteredLM(newIdx,1) = combinedLM(i,1);
-        filteredLM(newIdx,2) = combinedLM(i,2);
-        filteredLM(newIdx,13) = 3;
-        
-        i = i+1;
-        j = j+1;
-        % Movement occurs within a longer movement.
-    else
-        while (combinedLM(j,2) < combinedLM(i,2) && j < arrLength) % While end is within first LM
-            j = j+1;
-        end
-        filteredLM(newIdx,1) = combinedLM(i,1);
-        if (combinedLM(j,1) < combinedLM(i,2) && combinedLM(j,2) > combinedLM(i,2))
-            filteredLM(newIdx,2) = combinedLM(j,2);
-        else
-            filteredLM(newIdx,2) = combinedLM(i,2);
-        end
-        filteredLM(newIdx,13) = 3;
-        i = j;
-        j = j+1;
-        newIdx = newIdx + 1;
-    end
-end
-
-% Remove trailing zeroes
-filteredLM(all(filteredLM==0,2),:)=[];
 
 end
