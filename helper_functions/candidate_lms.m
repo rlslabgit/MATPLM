@@ -1,9 +1,11 @@
 function CLM = candidate_lms(rLM,lLM,epochStage,apd,ard,hgs,params)
 
 if isempty(rLM)
-    CLM = lLM;
+    lLM(:,3) = (lLM(:,2) - lLM(:,1))/params.fs;
+    CLM = lLM(lLM(:,3) < params.maxdur,:);
 elseif isempty(lLM)
-    CLM = rLM;
+    rLM(:,3) = (rLM(:,2) - rLM(:,1))/params.fs;
+    CLM = rLM(rLM(:,3) < params.maxdur,:);
 else
     % Combine left and right and sort.
     CLM = rOV(lLM,rLM,params.fs);
