@@ -1,4 +1,4 @@
-function [in] = getInput2(fs, ask)
+function [in,cancel] = getInput2(fs, ask)
 %% [in] = getInput2(fs, ask)
 % Display a dialog window that asks the user for several initial conditions
 % and parameters. Store these conditions in the 'in' structure, to be
@@ -76,7 +76,7 @@ Prompt(end+1,:) = {'Dynamic Threshold','thresh',[]};
 Formats(3,3).type = 'check';
 DefAns.thresh = true;
 
-[in,~] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
+[in,cancel] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
 
 in.lb1 = 0.5;
 in.ub1 = 0.5;

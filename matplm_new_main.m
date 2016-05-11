@@ -31,9 +31,15 @@ EKG = psg_struct.Signals(kidx(1)).data;
 % automatically gets sampling rate, as long as it is recorded in the .EDF
 % Unless the user specifies 'default_params', ask for them.
 if strcmp('default_params',varargin)
-    params = getInput2(psg_struct.Signals(ridx(1)).frq,false);
+    [params, quit] = getInput2(psg_struct.Signals(ridx(1)).frq,false);
+    if quit
+        return
+    end
 else
-    params = getInput2(psg_struct.Signals(ridx(1)).frq,true);
+    [params, quit] = getInput2(psg_struct.Signals(ridx(1)).frq,true);
+    if quit
+        return
+    end
 end
 
 % find hypnogram/apnea/arousal vectors, start and stop times (in data
@@ -78,8 +84,13 @@ if sep_flag == 0
     plm_outputs.CLMS = CLM(CLM(:,6) > 0,:);
 else
     % get CLM from each leg seperately
-    lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
-    rCLM = separate_candidates(rLM,epochStage,apnea_data,arousal_data,start_time,params);
+    %lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
+    %rCLM = separate_candidates(rLM,epochStage,apnea_data,arousal_data,start_time,params);
+    
+    lCLM = combined_candidates([],lLM,epochStage,apnea_data,...
+        arousal_data,start_time,params);
+    rCLM = combined_candidates(rLM,[],epochStage,apnea_data,...
+        arousal_data,start_time,params);
     
     [lPLM,~] = periodic_lms(lCLM,params);
     [~,ia,~] = intersect(lCLM(:,1),lPLM(:,1));
