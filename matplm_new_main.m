@@ -7,7 +7,7 @@ function [plm_outputs,lEMG,rEMG] = matplm_new_main(psg_struct,varargin)
 sep_flag = 0;
 plm_outputs = struct();
 
-addpath('helper_functions')
+addpath('C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\helper_functions')
 
 % TODO: Eventually, we'll run this file differently for separate legs
 if strcmp('separate_legs',varargin)

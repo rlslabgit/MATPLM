@@ -33,8 +33,8 @@ a(end,3) = beats(end,1);
 %%
 peaks = zeros(size(a,1)-2,3);
 
-frontbuff = fs/10;
-backbuff = fs/10;
+frontbuff = round(fs/10);
+backbuff = round(fs/10);
 
 % ignore first and last, causes too many problems
 for i = 2:size(a,1)-1
@@ -44,7 +44,7 @@ for i = 2:size(a,1)-1
     
     % Bound safety check (should never be false)
     if mid-2*frontbuff > 0
-        EKGless(mid-frontbuff:mid) = dsEMG(mid-2*frontbuff:mid-frontbuff);
+         EKGless(mid-frontbuff:mid) = dsEMG(mid-2*frontbuff:mid-frontbuff);
     end
     if mid+2*backbuff <= size(EKGless,1)
         EKGless(mid:mid+backbuff) = dsEMG(mid+backbuff:mid+2*backbuff);

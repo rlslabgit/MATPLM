@@ -8,7 +8,7 @@ function [es,ss,se,apd,ard,hgs] = errcheck_ss(psg_struct,LAT,RAT,fs)
 
 % Get sleep start and end
 try
-    ss = psg_struct.EDFStart2HypnoInSec * fs + 1;
+    ss = round(psg_struct.EDFStart2HypnoInSec) * fs + 1;
 catch
     warning('Reference to non-existent field ''EDFStart2HypnoInSec''');
     ss = 1;
