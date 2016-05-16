@@ -8,6 +8,8 @@ if ~ask
     in = struct('fs',fs,'maxdur',10,'minIMI',10,'maxIMI',90,'lb1',0.5,'ub1',0.5,...
     'lb2',0.5,'ub2',0.5,'lopass',round(fs * 0.45),'hipass',20,'thresh',true,...
     'ekg',true,'inlm',true,'minNumIMI',3);
+
+    cancel = false;
 else
 
 Title = 'MATPLM Parameters';

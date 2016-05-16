@@ -11,6 +11,17 @@ function [newPLM,h] = PLMApnea_rev2(PLM,ApneaData,HypnogramStart,lb,ub,fs)
 
 % Form newAp, which is ApneaData with endpoint of event (in datapoints) 
 % added to 4th col. This is calculated with HypnogramStart as datapoint 1
+
+% There seem to be inconsistencies with how records without apnea or
+% arousal data are coded. Sometimes it is a 1 x 3 vector of zeros, other
+% times it is a 0 x 3 array (I don't even know what that means). We have to
+% check for both, apparently.
+if size(ApneaData, 1) == 0
+    newPLM = PLM;
+    newPLM(1,11) = 0;
+    return
+end
+    
 if ApneaData{1,1} == 0
     newPLM = PLM;
     newPLM(1,11) = 0;

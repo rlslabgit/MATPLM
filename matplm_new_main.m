@@ -7,6 +7,13 @@ function [plm_outputs,lEMG,rEMG] = matplm_new_main(psg_struct,varargin)
 sep_flag = 0;
 plm_outputs = struct();
 
+if isempty(psg_struct)
+   [filename, filepath] = uigetfile('*.mat', 'Open a patient file:' );
+   psg_struct = load(fullfile(filepath,filename));
+   psg_struct = psg_struct.(char(fieldnames(psg_struct)));
+end
+
+
 addpath('C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\helper_functions')
 
 % TODO: Eventually, we'll run this file differently for separate legs

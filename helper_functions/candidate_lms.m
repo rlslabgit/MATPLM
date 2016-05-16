@@ -69,14 +69,13 @@ for i = 1:size(combLM(:,4),1)
         
         % allow up to max_num movements to combine
         for ii = 1:(max_num - 1)
-            if combLM(i + next_too) == 1
+            if combLM(i + next_too,4) == 1
                 next_too = next_too + 1;
-            end
-            
-            % if more than max_num, just leave
-            if next_too >= max_num
-                continue
-            end
+            end                        
+        end
+        % if more than max_num, just leave
+        if next_too >= max_num
+            continue
         end
         CLM = [CLM ; [combLM(i,1), combLM(i+next_too,2), 3]];
     
