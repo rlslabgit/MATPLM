@@ -5,9 +5,10 @@ function [in,cancel] = getInput2(fs, ask)
 % passed around the main function.
 
 if ~ask
-    in = struct('fs',fs,'maxdur',10,'minIMI',10,'maxIMI',90,'lb1',0.5,'ub1',0.5,...
-    'lb2',0.5,'ub2',0.5,'lopass',round(fs * 0.45),'hipass',20,'thresh',true,...
-    'ekg',true,'inlm',true,'minNumIMI',3);
+    in = struct('fs',fs,'maxdur',10,'bmaxdur',15,'minIMI',10,'maxIMI',90,...
+        'lb1',0.5,'ub1',0.5,'lb2',0.5,'ub2',0.5,'lopass',...
+        round(fs * 0.45),'hipass',20,'thresh',true,'ekg',true,'inlm',...
+        true,'minNumIMI',3,'maxcomb',4);
 
     cancel = false;
 else
@@ -80,11 +81,15 @@ DefAns.thresh = true;
 
 [in,cancel] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
 
+% Currently, there is no option to change these features in the dialog box
+% most users will not care.
 in.lb1 = 0.5;
 in.ub1 = 0.5;
 in.lb2 = 0.5;
 in.ub2 = 0.5;
 in.minNumIMI = 3;
+in.maxcomb = 4;
+in.bmaxdur = 15;
 end
 
 end
