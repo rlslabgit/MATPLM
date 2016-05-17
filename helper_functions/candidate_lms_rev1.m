@@ -29,6 +29,13 @@ if ~isempty(CLM)
     % 6). Col 5 is reserved for PLM marks later
     CLM = getIMI(CLM, params.fs);
     
+    % add breakpoints if IMI > 90 seconds (standard)
+    CLM(CLM(:,4) > params.maxIMI,9) = 1;
+    % add breakpoints if IMI < minIMI. This is according to new standards
+    if params.inlm
+        CLM(CLM(:,4) < params.minIMI, 9) = 1;   
+    end
+    
     if ~isempty(epochStage)
         CLM(:,6) = epochStage(round(CLM(:,1)/30/params.fs+.5));
     end

@@ -8,28 +8,16 @@ function [PLMt,CLMt] = periodic_lms(CLM,params)
 
 % Create CLMt array of all CLM with IMI greater than the minimum allowable
 % if intervening lm option is not selected, we remove CLMs whose IMI are
-% too short
+% too short. Really, new standards say that these should always be
+% breakpoint, so the first case is only for posterity.
 if ~params.inlm
     CLMt = removeShortIMI(CLM,params.minIMI,params.fs);
+    CLMt = getIMI(CLMt,params.fs);
 else
     CLMt = CLM;
 end
         
-CLMt(:,5) = 0; CLMt(:,9) = 0; % Restart PLM and Breakpoints
-
-% Recalculate IMI after removing those that are too short
-CLMt = getIMI(CLMt,params.fs);
-
-% Add break points where IMI > maxIMIDuration
-CLMt(:,9) = CLMt(:,4) > params.maxIMI | CLMt(:,3) > params.maxdur;
-aftLong = find(CLMt(:,3) > params.maxdur) + 1;
-aftLong = aftLong(aftLong < size(CLMt,1));
-CLMt(aftLong,9) = 1;
-
-% add breakpoints if IMI < minIMI. This is according to new standards
-if params.inlm
-    CLMt(CLMt(:,4) < params.minIMI, 9) = 1;   
-end
+CLMt(:,5) = 0; % Restart PLM
 
 BPloct = BPlocAndRunsArray(CLMt,params.minNumIMI);
 CLMt = markPLM3(CLMt,BPloct,params.fs);
