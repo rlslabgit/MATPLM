@@ -13,10 +13,6 @@ if isempty(psg_struct)
    psg_struct = psg_struct.(char(fieldnames(psg_struct)));
 end
 
-
-addpath('C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\helper_functions')
-
-% TODO: Eventually, we'll run this file differently for separate legs
 if strcmp('separate_legs',varargin)
     display('MATPLM will calculate CLM/PLM for each leg separately');
     sep_flag = 1;
@@ -94,9 +90,9 @@ else
     %lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
     %rCLM = separate_candidates(rLM,epochStage,apnea_data,arousal_data,start_time,params);
     
-    lCLM = candidate_lms_rev1(([],lLM,epochStage,apnea_data,...
+    lCLM = candidate_lms_rev1([],lLM,epochStage,apnea_data,...
         arousal_data,start_time,params);
-    rCLM = candidate_lms_rev1((rLM,[],epochStage,apnea_data,...
+    rCLM = candidate_lms_rev1(rLM,[],epochStage,apnea_data,...
         arousal_data,start_time,params);
     
     [lPLM,~] = periodic_lms(lCLM,params);
