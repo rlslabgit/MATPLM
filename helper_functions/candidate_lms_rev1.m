@@ -2,6 +2,9 @@ function CLM = candidate_lms_rev1(rLM,lLM,epochStage,apd,ard,hgs,params)
 
 % Reduce left and right LM arrays to exclude too long movements, but add
 % breakpoints to the following movement
+rLM(:,3) = (rLM(:,2) - rLM(:,1))/params.fs;
+lLM(:,3) = (lLM(:,2) - lLM(:,1))/params.fs;
+
 rLM(find(rLM(:,3) > params.maxdur) + 1, 9) = 1;
 rLM(rLM(:,3) > params.maxdur, :) = [];
 lLM(find(lLM(:,3) > params.maxdur) + 1, 9) = 1;
@@ -31,9 +34,12 @@ if ~isempty(CLM)
     
     % add breakpoints if IMI > 90 seconds (standard)
     CLM(CLM(:,4) > params.maxIMI,9) = 1;
-    % add breakpoints if IMI < minIMI. This is according to new standards
+    % add breakpoints if IMI < minIMI. This is according to new standards.
+    % I believe we also need a breakpoint after this movement, so that a
+    % short IMI cannot begin a run of PLM
     if params.inlm
-        CLM(CLM(:,4) < params.minIMI, 9) = 1;   
+        CLM(CLM(:,4) < params.minIMI, 9) = 1; 
+        CLM(find(CLM(:,4) < params.minIMI) + 1, 9) = 1;
     end
     
     if ~isempty(epochStage)
@@ -90,3 +96,14 @@ while i < size(CLM,1)
 end
 
 end
+
+function LM = getIMI(LM,fs)
+%% LM = getIMI(LM,fs)
+% getIMI calculates intermovement interval and stores in the fourth column
+% of the input array. IMI is onset-to-onset and measured in seconds
+
+LM(1,4) = 9999; % archaic... don't know if we need this
+LM(2:end,4) = (LM(2:end,1) - LM(1:end-1,1))/fs;
+
+end
+
