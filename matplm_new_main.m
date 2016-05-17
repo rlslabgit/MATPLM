@@ -79,7 +79,7 @@ plm_outputs.rLM = rLM;
 % TODO: what do I do about marking the PLM column in the CLM matrix?
 if sep_flag == 0
     % calculate PLM candidates by combining the legs
-    CLM = candidate_lms(rLM,lLM,epochStage,apnea_data,arousal_data,start_time,params);
+    CLM = candidate_lms_rev1(rLM,lLM,epochStage,apnea_data,arousal_data,start_time,params);
     [PLM,~] = periodic_lms(CLM,params);
     [~,ia,~] = intersect(CLM(:,1),PLM(:,1));
     CLM(ia,5) = 1; % go back and mark PLM in CLM
@@ -94,9 +94,9 @@ else
     %lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
     %rCLM = separate_candidates(rLM,epochStage,apnea_data,arousal_data,start_time,params);
     
-    lCLM = candidate_lms([],lLM,epochStage,apnea_data,...
+    lCLM = candidate_lms_rev1(([],lLM,epochStage,apnea_data,...
         arousal_data,start_time,params);
-    rCLM = candidate_lms(rLM,[],epochStage,apnea_data,...
+    rCLM = candidate_lms_rev1((rLM,[],epochStage,apnea_data,...
         arousal_data,start_time,params);
     
     [lPLM,~] = periodic_lms(lCLM,params);
