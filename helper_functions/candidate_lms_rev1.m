@@ -106,4 +106,3 @@ LM(1,4) = 9999; % archaic... don't know if we need this
 LM(2:end,4) = (LM(2:end,1) - LM(1:end-1,1))/fs;
 
 end
-
