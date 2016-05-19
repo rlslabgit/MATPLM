@@ -6,9 +6,9 @@ rLM(:,3) = (rLM(:,2) - rLM(:,1))/params.fs;
 lLM(:,3) = (lLM(:,2) - lLM(:,1))/params.fs;
 
 rLM(find(rLM(:,3) > params.maxdur) + 1, 9) = 1;
-rLM(rLM(:,3) > params.maxdur, :) = [];
+rLM = rLM(rLM(:,3) <= params.maxdur, :);
 lLM(find(lLM(:,3) > params.maxdur) + 1, 9) = 1;
-lLM(lLM(:,3) > params.maxdur, :) = [];
+lLM = lLM(lLM(:,3) <= params.maxdur, :);
 
 % Combine left and right and sort.
 CLM = rOV2(lLM,rLM,params.fs);

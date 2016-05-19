@@ -1,18 +1,17 @@
 function LM = new_indices(oEMG, EKG, fs)
 %% LM = new_indices(oEMG, fs)
-% remember, this takes filtered, unrectified EMG...
+
 
 % min_high = minimum time without falling below low threshold to signal
 % start of movement
 % min_low = minimum time without rising above low threshold to signal end
 % of movement.
-%
 % I don't know why you would want to change these values, so they are not
 % listed as parameters in the initial dialog. You can change them here.
 min_high = 0.5;
 min_low = 0.5;
 
-EMG = abs(oEMG); %
+EMG = abs(oEMG); % just in case I guess?
 LM = [];
 
 window_size = fs * 30;  % try a 30 second sliding window
@@ -30,6 +29,7 @@ for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
     interest = EMG(cur_start:cur_end,1);
     interstk = EKG(cur_start:cur_end,1);
     bl = findbl(interest,fs);
+    
     
     lowt = bl + 2; % low threshold is two above baseline
     hit = lowt + 6; % this really should be variable
@@ -60,7 +60,6 @@ for n = 0:0.5:(floor(size(EMG,1)/window_size)-1)
         hit = lowt + 6; % this really should be variable
     end
     
-    
     % so now, we actualy search for the correct threshold and do
     % cut low median at the same time
     lm_here = findIndices(interest,lowt,hit,min_high,min_low,fs);
@@ -82,10 +81,9 @@ end
 
 warning('on','signal:findpeaks:largeMinPeakHeight') % turn back on
 
-% TODO: remove identical or overlapping
+% remove identical or overlapping
 LM = check_edges(LM, min_low, fs);
 LM = LM(:,1:2); % only keep start and stop
-
 end
 
 % check if we have movements that continue from one window to the next

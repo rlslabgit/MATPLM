@@ -1,7 +1,7 @@
-function LM = new_indices_rev1(oEMG, EKG, fs)
-
-oEMG = removeEKG(oEMG, EKG, 500);
+function [LM,t] = new_indices_rev1(oEMG, fs)
 
 t = dt(oEMG,fs);
-LM = findIndices(oEMG(:,1),t+2,t+8,0.5,0.5,500);
+oEMG = removeEKG_rev1(oEMG,500,t(:,2));
 
+LM = findIndices(oEMG(:,1), t(:,2), t(:,3), 0.5, 0.5, fs);
+LM = cutLowMedian_rev1(LM, oEMG, fs, t(:,2));

@@ -1,4 +1,4 @@
-function [plm_outputs,lEMG,rEMG, EKG] = matplm_new_main(psg_struct,varargin)
+function [plm_outputs,lEMG,rEMG, EKG] = matplm_new_main_rev1(psg_struct,varargin)
 %% [plm_outputs] = matplm_new_main(psg_struct)
 % The main driving function for the MATPLM program. Input is the full
 % subject structure, transferred from EDF format with EDF
@@ -68,8 +68,8 @@ EKG = butter_rect(struct('hipass',0.5,'lopass',40,'fs',500),EKG,rec_start,rec_en
 
 % Also note the '+6' after *minT: the high threshold is traditionally 8
 % microvolts above the noise (or 6 above the low threshold)
-lLM = new_indices(lEMG, EKG, params.fs);
-rLM = new_indices(rEMG, EKG, params.fs);
+lLM = new_indices_rev1(lEMG,params.fs);
+rLM = new_indices_rev1(rEMG,params.fs);
 
 % we always want these in the output array
 plm_outputs.lLM = lLM;
@@ -77,7 +77,7 @@ plm_outputs.rLM = rLM;
 
 %% Calculate candidate LMs and PLMs for combined/separate legs
 % Here is where things diverge if the user specifies 'separate_legs'
-% TODO: what do I do about marking the PLM column in the CLM matrix?
+
 if sep_flag == 0
     % calculate PLM candidates by combining the legs
     CLM = candidate_lms_rev1(rLM,lLM,epochStage,apnea_data,arousal_data,start_time,params);

@@ -1,4 +1,4 @@
-function [EKGless, peaks] = removeEKG(dsEMG,dsEKG,fs)
+function [EKGless, a] = removeEKG(dsEMG,dsEKG,fs)
 %% Subtracts EKG from noisey EMG channels
 % [EKGless, peaks] = removeEKG(dsEMG,dsEKG,fs)
 %
@@ -30,9 +30,6 @@ a(:,2) = beats(a(:,1),1);
 a(1:end-1,3) = beats(a(2:end,1)-1,1);
 a(end,3) = beats(end,1);
 
-%%
-peaks = zeros(size(a,1)-2,3);
-
 frontbuff = round(fs/10);
 backbuff = round(fs/10);
 
@@ -50,10 +47,6 @@ for i = 2:size(a,1)-1
         EKGless(mid:mid+backbuff) = dsEMG(mid+backbuff:mid+2*backbuff);
     end
     
-%     peaks(i-1,1) = mid; % location of peak
-%     peaks(i-1,2) = dsEKG(mid,1); % remember: EKG is squared
-%     peaks(i-1,3) = dsEMG(mid,1) > mean(dsEMG(mid-2*frontbuff:mid-frontbuff,1))...
-%         + 5 * std(dsEMG(mid-2*frontbuff:mid-frontbuff,1));
 end
 
 end
