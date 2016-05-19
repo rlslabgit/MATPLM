@@ -17,4 +17,7 @@ t(t < 0.5) = 3;
 % t(t(:,1) > 5, 2) = t(t(:,1) > 5, 1)*3;
 % t(t(:,1) > 5, 3) = t(t(:,1) > 5, 1)*3;
 
-t(t
+t(:,2) = t(:,1) + 2; % low thresh is 2 above baseline
+t(:,3) = t(:,1) + 8; % high thresh is 8 above baseline
+
+t(t(:,1) > 15,2:3) = inf; % turn it off when noise is higher than 15

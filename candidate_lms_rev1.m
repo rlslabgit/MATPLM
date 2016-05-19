@@ -43,6 +43,9 @@ if ~isempty(CLM)
         % if the following line is uncommented, CLM with short IMI will not
         % be able to start a PLM run
         % CLM(find(CLM(:,4) < params.minIMI) + 1, 9) = 1;
+    else
+        CLM = CLM(CLM(:,4) >= params.minIMI,:);
+        CLM = getIMI(CLM,500);
     end
     
     if ~isempty(epochStage)

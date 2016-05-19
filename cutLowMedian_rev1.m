@@ -15,4 +15,4 @@ for i = 1:size(LM,1)
     end
 end
 
-nLM = nLM(1:j,:);
+nLM = nLM(1:j-1,:);

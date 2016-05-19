@@ -8,7 +8,7 @@ function dsEMG = butter_rect(pars,EMG,ss,se,varargin)
 dsEMG = filtfilt(b,a,EMG(ss:se,1));
 dsEMG = filtfilt(d,c,dsEMG);
 
-if ~strcmp('noabs',varargin)
+if strcmp('rect',varargin)
     dsEMG = abs(dsEMG);    
 end
 

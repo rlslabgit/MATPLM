@@ -58,8 +58,8 @@ end
 
 %% Filter and rectify data. Optionally apply dynamic threshold
 % Truncate, filter and rectify EMG signals.
-lEMG = butter_rect(params,lEMG,rec_start,rec_end);
-rEMG = butter_rect(params,rEMG,rec_start,rec_end);
+lEMG = butter_rect(params,lEMG,rec_start,rec_end,'rect');
+rEMG = butter_rect(params,rEMG,rec_start,rec_end,'rect');
 
 EKG = butter_rect(struct('hipass',0.5,'lopass',40,'fs',500),EKG,rec_start,rec_end);
 
@@ -68,8 +68,8 @@ EKG = butter_rect(struct('hipass',0.5,'lopass',40,'fs',500),EKG,rec_start,rec_en
 
 % Also note the '+6' after *minT: the high threshold is traditionally 8
 % microvolts above the noise (or 6 above the low threshold)
-lLM = new_indices_rev1(lEMG,params.fs);
-rLM = new_indices_rev1(rEMG,params.fs);
+lLM = new_indices_rev1(lEMG,params);
+rLM = new_indices_rev1(rEMG,params);
 
 % we always want these in the output array
 plm_outputs.lLM = lLM;
@@ -119,6 +119,7 @@ else
     plm_outputs.rCLMS = rCLM(rCLM(:,6) > 0,:);
 end
 
+plm_outputs.hypnostart = psg_struct.CISRE_HypnogramStart;
 plm_outputs.column_headers = {'Start','End','Duration','IMI','isPLM','SleepStage',...
     'Start_in_Min','StartEpoch','Breakpoint','Area','isApnea','isArousal',...
     'Lateraltiynessment'};
