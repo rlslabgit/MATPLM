@@ -25,6 +25,15 @@ for i = 1:size(PLM,1)
     rEMG(PLM(i,1):PLM(i,2),3) = rEMG(PLM(i,1):PLM(i,2),1);
 end
 
-h(1) = subplot(2,1,1); reduce_plot(lEMG);
-h(2) = subplot(2,1,2); reduce_plot(rEMG);
-linkaxes(h,'x');
+t = (1:size(lEMG))/500/24/3600; t = t';
+
+h(1) = subplot(2,1,1); reduce_plot(t,lEMG);
+datetickzoom('x','HH:MM:SS');
+h(2) = subplot(2,1,2); reduce_plot(t,rEMG);
+linkaxes(h,'x'); datetickzoom('x','HH:MM:SS');
+
+
+end
+
+
+
