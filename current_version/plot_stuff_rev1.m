@@ -1,4 +1,4 @@
-function plot_stuff_rev1(rEMG, lEMG, plm_outputs)
+function plot_stuff_rev1(rEMG, lEMG, plm_outputs, fs)
 
 rLM = plm_outputs.rLM;
 lLM = plm_outputs.lLM;
@@ -25,7 +25,7 @@ for i = 1:size(PLM,1)
     rEMG(PLM(i,1):PLM(i,2),3) = rEMG(PLM(i,1):PLM(i,2),1);
 end
 
-t = (1:size(lEMG))/500/24/3600; t = t';
+t = (1:size(lEMG))/fs/24/3600; t = t';
 
 h(1) = subplot(2,1,1); reduce_plot(t,lEMG);
 datetickzoom('x','HH:MM:SS');

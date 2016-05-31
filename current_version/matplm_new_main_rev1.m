@@ -1,4 +1,4 @@
-function [plm_outputs,lEMG,rEMG, EKG] = matplm_new_main_rev1(psg_struct,varargin)
+function [plm_outputs,lEMG,rEMG] = matplm_new_main_rev1(psg_struct,varargin)
 %% [plm_outputs] = matplm_new_main(psg_struct)
 % The main driving function for the MATPLM program. Input is the full
 % subject structure, transferred from EDF format with EDF
@@ -27,14 +27,13 @@ end
 %% Extract necessary data from structure
 % find the LAT and RAT channels in the structure
 % TODO: support different channel naming styles
+%   solution: add these names when we convert
 lbls = extractfield(psg_struct.Signals,'label');
 lidx = find(not(cellfun('isempty', strfind(lbls,'Left'))));
 ridx = find(not(cellfun('isempty', strfind(lbls,'Right'))));
-kidx = find(not(cellfun('isempty', strfind(lbls,'EKG'))));
 
 lEMG = psg_struct.Signals(lidx(1)).data;
 rEMG = psg_struct.Signals(ridx(1)).data;
-EKG = psg_struct.Signals(kidx(1)).data;
 
 % automatically gets sampling rate, as long as it is recorded in the .EDF
 % Unless the user specifies 'default_params', ask for them.
@@ -60,8 +59,6 @@ end
 % Truncate, filter and rectify EMG signals.
 lEMG = butter_rect(params,lEMG,rec_start,rec_end,'rect');
 rEMG = butter_rect(params,rEMG,rec_start,rec_end,'rect');
-
-EKG = butter_rect(struct('hipass',0.5,'lopass',40,'fs',500),EKG,rec_start,rec_end);
 
 %% Calculate leg movements for each leg channel
 % Find all leg movements on the left and right legs.
