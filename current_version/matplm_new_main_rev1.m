@@ -1,13 +1,9 @@
-function [plm_outputs,lEMG,rEMG] = matplm_new_main_rev1(psg_struct,varargin)
+function [plm_outputs, varargout] = matplm_new_main_rev1(psg_struct,varargin)
 %% [plm_outputs] = matplm_new_main(psg_struct)
 % The main driving function for the MATPLM program. Input is the full
 % subject structure, transferred from EDF format with EDF
 % Conversion/Generic_Convert.m. This version uses 'new_indices', which does
-% not give the option to apply DT, morph or EKG, but does it anyway.
-
-
-%TODO: use varargout for readibility and extra use
-
+% not give the option to apply DT, morph or EKG, but does it anyway
 
 sep_flag = 0;
 plm_outputs = struct();
@@ -117,8 +113,16 @@ else
 end
 
 plm_outputs.hypnostart = psg_struct.CISRE_HypnogramStart;
+plm_outputs.epochstage = epochStage;
 plm_outputs.column_headers = {'Start','End','Duration','IMI','isPLM','SleepStage',...
     'Start_in_Min','StartEpoch','Breakpoint','Area','isApnea','isArousal',...
     'Lateraltiynessment'};
+
+
+poss_outs = {'lEMG', 'rEMG'};
+nout = max(nargout,1) - 1;
+for k = 1:nout
+    varargout{k} = eval(poss_outs{k});
+end
 
 end
