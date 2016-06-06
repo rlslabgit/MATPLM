@@ -45,7 +45,7 @@ Formats(1,3).format = 'integer';
 %Formats(1,3).size = 80; % automatically assign the height
 DefAns.hipass = 20;
 
-Prompt(end+1,:) = {'Maximum Duration', 'maxdur','s'};
+Prompt(end+1,:) = {'Maximum Duration (monolateral)', 'maxdur','s'};
 Formats(2,1).type = 'edit';
 Formats(2,1).format = 'integer';
 Formats(2,1).size = 80; % automatically assign the height

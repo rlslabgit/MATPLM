@@ -60,10 +60,10 @@ end
 % If there are any NaNs in the record, filtering will fail. We must end the
 % record when a NaN is found
 if size(find(isnan(LAT(ss:se)),1)) > 0
-    se = find(isnan(LAT(ss:se)),1) - 1; 
+    se = ss + find(isnan(LAT(ss:se)),1) - 2; 
 end 
 if size(find(isnan(RAT(ss:se)),1)) > 0
-    se = find(isnan(RAT(ss:se)),1) - 1; 
+    se = ss + find(isnan(RAT(ss:se)),1) - 2; 
 end 
 
 end
