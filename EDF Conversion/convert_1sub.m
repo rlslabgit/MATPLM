@@ -43,7 +43,7 @@ end
 if havs.ar
     % Hypnogram filename should contain the word 'SleepStage'
     f = dir('*Arousal*'); f = f(1).name;
-    T = readtable(f,'headerlines',18);
+    T = readtable(f,'headerlines',18,'Delimiter','\t');
     T = table2cell(T);
     if size(T,1) > 0
         T(:,1) = cellstr(datestr(datenum(T(:,1),fd_format),new_format));  

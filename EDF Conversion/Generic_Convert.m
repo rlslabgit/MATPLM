@@ -19,7 +19,7 @@ tic
 
 % ProtocolDIR is the path to the directory containing the subject folders.
 % Must end in '/'
-ProtocolDIR = 'D:/Insomnia Data/';                   %
+ProtocolDIR = 'D:/tDCS Data/';                   %
 modDateAfter = '13-Jan-2016 5:03:00'; %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
