@@ -5,9 +5,9 @@ function CLM = candidate_lms_rev1(rLM,lLM,epochStage,apd,ard,hgs,params)
 rLM(:,3) = (rLM(:,2) - rLM(:,1))/params.fs;
 lLM(:,3) = (lLM(:,2) - lLM(:,1))/params.fs;
 
-rLM(find(rLM(:,3) > params.maxdur) + 1, 9) = 1;
+rLM(find(rLM(1:end-1,3) > params.maxdur) + 1, 9) = 1;
 rLM = rLM(rLM(:,3) <= params.maxdur, :);
-lLM(find(lLM(:,3) > params.maxdur) + 1, 9) = 1;
+lLM(find(lLM(1:end-1,3) > params.maxdur) + 1, 9) = 1;
 lLM = lLM(lLM(:,3) <= params.maxdur, :);
 
 % Combine left and right and sort.
