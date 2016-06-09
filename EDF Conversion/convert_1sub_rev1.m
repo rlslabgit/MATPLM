@@ -1,4 +1,4 @@
-function EDF = convert_1sub()
+function EDF = convert_1sub_rev1(varargin)
 %% EDF = convert_1sub(FilePath)
 
 addpath(['C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\'...
@@ -6,23 +6,33 @@ addpath(['C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\'...
 addpath(['C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\'...
     'EDF Conversion']);
 
+home = pwd;
+
 new_format = 'yyyy-mm-dd HH:MM:SS.fff'; % outputted date format
 
-[havs, canc, date_format] = what_have();
+if nargin == 1
+    path = varargin{1}; cd(path)
+    s = dir('*SleepStage*'); s = empty_struct(s);
+    r = dir('*Arousal*'); r = empty_struct(r);
+    p = dir('*Apnea*'); p = empty_struct(p);
+    edf = dir('*.edf'); edf = empty_struct(edf);
+else
+    edf = ''; s = ''; r = ''; p = '';
+end
+
+[havs, canc, date_format] = what_have(edf,s,r,p);
+
 if canc, return; end
+if isempty(havs.file_loc), return; end
 fd_format = date_format; % date format in the txt files
 
-cd(havs.file_loc);
-
-edf = dir('*.edf'); edf = edf(1).name;
-EDF = EDF_read_jhmi_rev_101(edf);
+EDF = EDF_read_jhmi_rev_101(havs.file_loc);
 %EDF = struct([]);
 EDF.EDFStart = EDF.dateTime;
 
-if havs.hyp
+if ~isempty(havs.hyp_loc) && havs.hyp
     % Hypnogram filename should contain the word 'SleepStage'
-    f = dir('*SleepStage*'); f = f(1).name;
-    T = readtable(f,'headerlines',14);
+    T = readtable(havs.hyp_loc,'headerlines',havs.hyp_head,'Delimiter','\t');
     
     d = char(T.Var1(1)); 
     EDF(1).CISRE_HypnogramStart = datestr(datenum(d,fd_format),new_format);
@@ -40,10 +50,9 @@ if havs.hyp
         datevec(EDF.EDFStart));
 end
 
-if havs.ar
+if ~isempty(havs.ar_loc) && havs.ar
     % Hypnogram filename should contain the word 'SleepStage'
-    f = dir('*Arousal*'); f = f(1).name;
-    T = readtable(f,'headerlines',18,'Delimiter','\t');
+    T = readtable(havs.ar_loc,'headerlines',havs.ar_head,'Delimiter','\t');
     T = table2cell(T);
     if size(T,1) > 0
         T(:,1) = cellstr(datestr(datenum(T(:,1),fd_format),new_format));  
@@ -51,12 +60,13 @@ if havs.ar
     else
         EDF.CISRE_Arousal = cell(0);
     end
+else
+    EDF.CISRE_Arousal = cell(0);
 end
 
-if havs.ap
+if ~isempty(havs.ap_loc) && havs.ap
 % Apnea filename should contain the word 'Apnea'
-    f = dir('*Apnea*'); f = f(1).name;
-    T = readtable(f,'headerlines',20);
+    T = readtable(havs.ap_loc,'headerlines',havs.ap_head,'Delimiter','\t');
     T = table2cell(T);
     if size(T,1) > 0
         T(:,1) = cellstr(datestr(datenum(T(:,1),fd_format),new_format));  
@@ -64,14 +74,16 @@ if havs.ap
     else
         EDF.CISRE_Apnea = cell(0);
     end
+else
+    EDF.CISRE_Apnea = cell(0);
 end
 
 
-
+cd(home)
 end
 
 
-function [Answer, Cancelled, date_format] = what_have()
+function [Answer, Cancelled, date_format] = what_have(edf,s,r,p)
 %%%% SETTING DIALOG OPTIONS
 Options.Resize = 'on';
 Options.Interpreter = 'tex';
@@ -120,29 +132,39 @@ Prompt(end+1,:) = {'EDF path', 'file_loc', []};
 Formats(5,1).type = 'edit'; Formats(5,1).format = 'file';
 Formats(5,1).limits = [0 1]; % use uiputfile
 Formats(5,1).span = [1, 3];  % item is 1 field x 3 fields
-DefAns.file_loc = '';
+Formats(5,1).items = {'*.edf','European Data Format';'*.*','All Files'};
+DefAns.file_loc = edf;
 
 Prompt(end+1,:) = {'Hypnogram path', 'hyp_loc', []};
 Formats(6,1).type = 'edit'; Formats(6,1).format = 'file';
 Formats(6,1).limits = [0 1]; % use uiputfile
 Formats(6,1).span = [1, 3];  % item is 1 field x 3 fields
-DefAns.hyp_loc = '';
+Formats(6,1).items = {'*.txt','Text Files';'*.*','All Files'};
+DefAns.hyp_loc = s;
 
 Prompt(end+1,:) = {'Arousal path', 'ar_loc', []};
 Formats(7,1).type = 'edit'; Formats(7,1).format = 'file';
 Formats(7,1).limits = [0 1]; % use uiputfile
 Formats(7,1).span = [1, 3];  % item is 1 field x 3 fields
-DefAns.ar_loc = '';
+Formats(7,1).items = {'*.txt','Text Files';'*.*','All Files'};
+DefAns.ar_loc = r;
 
 Prompt(end+1,:) = {'Apnea path', 'ap_loc', []};
 Formats(8,1).type = 'edit'; Formats(8,1).format = 'file';
 Formats(8,1).limits = [0 1]; % use uiputfile
 Formats(8,1).span = [1, 3];  % item is 1 field x 3 fields
-DefAns.ap_loc = '';
-
-
+Formats(8,1).items = {'*.txt','Text Files';'*.*','All Files'};
+DefAns.ap_loc = p;
 
 [Answer,Cancelled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
 date_format = Formats(2,3).items{Answer.file_date};
 
+end
+
+function a = empty_struct(b)
+    if size(b,1) > 0
+        a = b(1).name;
+    else
+        a = '';
+    end
 end
