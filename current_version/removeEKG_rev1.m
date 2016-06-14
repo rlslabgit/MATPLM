@@ -1,6 +1,6 @@
-function kEMG = removeEKG_rev1(EMG,fs,t)
+function [kEMG, did] = removeEKG_rev1(EMG,fs,t)
 
-kEMG = EMG;
+kEMG = EMG; did = false;
 % turn off peak warning, it just means there are no peaks in this epoch
 warning('off','signal:findpeaks:largeMinPeakHeight')
 window_size = fs * 30;  % try a 30 second sliding window
@@ -14,12 +14,16 @@ for n = 0:(floor(size(EMG,1)/window_size)-1)
     
     hit = t(cur_start);
     [~, rel] = findpeaks(interest.^2,'MinPeakHeight',hit.^2,...
-        'MinPeakDistance',0.150*500);
+        'MinPeakDistance',0.150*fs);
     rel(2:end,2) = (rel(2:end,1) - rel(1:end-1,1))/fs;
-    beats = rel(:,2) > 0.7 & rel(:,2) < 1.2;
+    beats = rel(:,2) > 0.7 & rel(:,2) < 1.3;
     
     if size(rel,1) > 20 && sum(beats)/size(rel,1) > 0.2
+        did = true;
         kEMG(cur_start:cur_end,1) = kill_peaks(interest,rel(beats),fs);
+        
+        h(1) = subplot(2,1,1); plot(h(1), interest);
+        h(2) = subplot(2,1,2); plot(h(2), kEMG(cur_start:cur_end,1));
     end
 end
 warning('on','signal:findpeaks:largeMinPeakHeight')

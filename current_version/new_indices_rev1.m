@@ -3,8 +3,10 @@ function [LM,t] = new_indices_rev1(oEMG, params)
 t = dt(oEMG,params.fs);
 
 if params.ekg   
-    oEMG = removeEKG_rev1(oEMG,500,t(:,2));
-    t = dt(oEMG,params.fs); % should recalculate (maybe don't have to)
+    [oEMG, re] = removeEKG_rev1(oEMG,params.fs,t(:,2));
+    if re
+        t = dt(oEMG,params.fs); % should recalculate (maybe don't have to)
+    end
 end
 
 % if they want a static threshold, just take the most common
