@@ -1,22 +1,34 @@
-%%%%
-%%  [Indices] = findIndices(data,lowThreshold,highThreshold,minLowDuration,minHighDuration)
-%%  returns array of indices defining the periods of data above the highThreshold that last for
-%%  a minimum length of minHighDuration, without an interruption below lowThreshold that lasts for
-%%  a minimum length of minLow Duration,
-%%%%minHighDuration
 function [fullRuns] = findIndices(data,lowThreshold,highThreshold,minLowDuration,minHighDuration,fs)
+%% [fullRuns] = findIndices(data,lowThreshold,highThreshold,minLowDuration,minHighDuration,fs)
+%  returns array of indices defining the periods of data above the 
+%  highThreshold that last for a minimum length of minHighDuration, without
+%  an interruption below lowThreshold that lasts for a minimum length of
+%  minLow Duration
+%
+%  inputs:
+%   - data - filtered and rectified EMG channel
+%   - lowThreshold - a scalar threshold, or a vector with the same length
+%   as data which contains the threshold used to define end of movement
+%   - highThreshold - threshold for start of movement
+%   - minLowDuration - time (in sec) below low threshold to define end of
+%   movement
+%   - minHighDuration - time above low threshold to define start of
+%   movement
+%   - fs - sampling rate
+
+
     minLowDuration = minLowDuration * fs;
     minHighDuration = minHighDuration * fs;
     lowValues = find(data < lowThreshold);          
     highValues = find(data > highThreshold);
     if size(highValues,1) < 1
-        fullRuns(1,1) = 0;                  %ends function if no highvalues detected 
-        fullRuns(1,2) = 0;                   %sets array with runs to  0  0               
+        fullRuns(1,1) = 0;         %ends function if no highvalues detected 
+        fullRuns(1,2) = 0;         %sets array with runs to  0  0               
         return;
     end
     if size(lowValues,1) < 1
-        fullRuns(1,1) = 1;                  %ends function if not lowValues detected
-        fullRuns(1,2) = 0;                   % sets array with runs to 1  0
+        fullRuns(1,1) = 1;         %ends function if not lowValues detected
+        fullRuns(1,2) = 0;         % sets array with runs to 1  0
         return;
     end 
 
@@ -53,35 +65,6 @@ function [fullRuns] = findIndices(data,lowThreshold,highThreshold,minLowDuration
     %%Implement a quality control to only keep highRuns > minHighDuration
     runLengths = highRuns(:,2)-highRuns(:,1);
     fullRuns = highRuns(find(runLengths > minHighDuration),:);
-    
-    
-    
-    
-        
-    
-    %%%CREATE GRAPHICAL OUTPUT SO THAT I CAN SEE THAT IT"S WORKING
-    
-%     Indices = highRuns;
-%     figure;
-%     hold on;
-%     plot(data,'b')
-%     plot([1,size(data,1)],[lowThreshold,lowThreshold],'r--');
-%     plot([1,size(data,1)],[highThreshold,highThreshold],'r--');
-%     for i=1:size(Indices,1)
-%         plot([Indices(i,1),Indices(i,2)],[highThreshold,highThreshold],'g-','LineWidth',5);
-%     end
-%     
-%     Indices = lowRuns;
-%     for i=1:size(Indices,1)
-%         plot([Indices(i,1),Indices(i,2)],[lowThreshold,lowThreshold],'m-','LineWidth',5);
-%     end
-%     
-%     Indices = fullRuns;
-%     for i=1:size(Indices,1)
-%         plot([Indices(i,1),Indices(i,2)],[mean([highThreshold,lowThreshold]),mean([highThreshold,lowThreshold])],'r-','LineWidth',5);
-%     end
-%     
-
 end
 
 

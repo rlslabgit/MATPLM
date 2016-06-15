@@ -2,7 +2,17 @@ function [in,cancel] = getInput2(fs, ask)
 %% [in] = getInput2(fs, ask)
 % Display a dialog window that asks the user for several initial conditions
 % and parameters. Store these conditions in the 'in' structure, to be
-% passed around the main function.
+% passed around the main function. Program will terminate if cancel is
+% true. Based off of the file 'inputsdlg.m', which is a script by Takeshi 
+% Ikuma that expands the functionality of matlab's built-in input dialogs.
+%
+% See the bottom of this function for several parameters related to the
+% classification of PLM that most users will have no desire to change, but
+% can do so here.
+%
+% inputs:
+%   - fs - sampling rate (for filter estimates)
+%   - ask - if false, just returns the default struct
 
 if ~ask
     in = struct('fs',fs,'maxdur',10,'bmaxdur',15,'minIMI',10,'maxIMI',90,...
@@ -83,6 +93,7 @@ DefAns.thresh = true;
 
 % Currently, there is no option to change these features in the dialog box
 % most users will not care.
+% first four are related to associating 
 in.lb1 = 0.5;
 in.ub1 = 0.5;
 in.lb2 = 0.5;

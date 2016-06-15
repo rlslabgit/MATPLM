@@ -1,4 +1,29 @@
-function CLM = candidate_lms_rev1(rLM,lLM,epochStage,apd,ard,hgs,params)
+function CLM = candidate_lms_rev1(rLM,lLM,epochStage,params, varargin)
+%% CLM = candidate_lms_rev1(rLM,lLM,epochStage,params, varargin)
+% Determine candidate leg movements for PLM from monolateral LM arrays. If
+% either rLM or lLM is empty ([]), this will return monolateral candidates,
+% otherwise if both are provided they will be combined according to current
+% WASM standards. Adds other information to the CLM table, notably
+% breakpoints to indicate potential ends of PLM runs, sleep stage, etc. Of
+% special note, the 13th column of the output array indicates which leg the
+% movement is from: 1 is right, 2 is left and 3 is bilateral.
+%
+% inputs:
+%   - rLM - array from right leg (needs start and stop times)
+%   - lLM - array from left leg
+%   - epochStage - hypnogram, expects 30 second epochs
+%   - params - output struct from 'getInput2.m'
+%
+% optional inputs:
+%   - apd - apnea data, from the original subject struct
+%   - ard - arousal data
+%   - hgs - hypnogram start time
+
+
+if nargin >= 5, apd = varargin{1}; end
+if nargin >= 6, ard = varargin{2}; end
+if nargin == 7, hgs = varargin{3}; end
+
 
 % Reduce left and right LM arrays to exclude too long movements, but add
 % breakpoints to the following movement
@@ -63,10 +88,10 @@ if ~isempty(CLM)
     CLM(:,10) = 0;
     
     % Add apnea events (col 11) and arousal events (col 12)
-    if ~isempty(apd) && ~isempty(hgs)
+    if exist('apd','var') && exist('hgs','var')
         CLM = PLMApnea_rev2(CLM,apd,hgs,params.lb1,params.ub1,params.fs);
     end
-    if ~isempty(ard) && ~isempty(hgs)
+    if exist('ard','var') && exist('hgs','var')
         CLM = PLMArousal_rev2(CLM,ard,hgs,params.lb2,params.ub2,params.fs);
     end
 end
@@ -74,7 +99,7 @@ end
 end
 
 function [CLM] = rOV2(lLM,rLM,fs)
-%% REMOVEOVERLAP combine left and right leg LMs
+% Combine bilateral movements if they are separated by < 0.5 seconds
 
 % combine and sort LM arrays
 rLM(:,13) = 1; lLM(:,13) = 2;

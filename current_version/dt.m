@@ -1,12 +1,24 @@
 function t = dt(EMG,fs)
 %% t = dt(EMG,fs)
-% another attempt at a dynamic threshold, using the strategy described by
-% Moore and Diego
+% Create a dynamic threshold that is the length of the EMG signal. This
+% file requires the image processing toolbox. The output, t, has three
+% columns: the first is the baseline level, the second is the low threshold
+% (which is either 2 uv > baseline, or inf if > 15 uv) and third is the
+% high threshold. Lots of room for experimentation on the lengths of the
+% min and max filters, but currently the 0.5 second lookback max filter is
+% good for avoiding EKG interference and other spurious, closely spaced
+% spikes.
 
+% Create a smoothed signal to determine the baseline from. Smoothed signal
+% is the moving average + five standard deviations. Moving average alone
+% tends to underestimate the baseline, since the baseline is stochastic
 lit_window = round((0.3)*fs)+1;
 s = movingstd(EMG(:,1),lit_window,'central')*5;
 t = smooth(EMG(:,1),lit_window) + s;
 
+% determine the baseline with two lookback filters. First, a 0.5 second
+% lookback max filter is applied to the smoothed signal, then a 60 second
+% lookback min filter.
 t = imdilate(t,ones(fs/2,1));
 t = imerode(t,ones(fs*60,1));
 

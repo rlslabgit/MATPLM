@@ -1,9 +1,20 @@
 function [plm_outputs, varargout] = matplm_new_main_rev1(psg_struct,varargin)
 %% [plm_outputs] = matplm_new_main(psg_struct)
-% The main driving function for the MATPLM program. Input is the full
-% subject structure, transferred from EDF format with EDF
-% Conversion/Generic_Convert.m. This version uses 'new_indices', which does
-% not give the option to apply DT, morph or EKG, but does it anyway
+% The main driving function for the MATPLM program. Returns a structure of
+% arrays with descriptions of PLMS and other, more general movements.
+%
+% inputs:
+%   - psg_struct - the subject structure, output from edf conversion stuff
+%
+% optional inputs:
+%   - 'separate_legs' - process each leg channel individually, affects
+%   outputs
+%   - 'default_params' - don't ask for inputs, just use the defaults (see
+%   'getInput2.m' for the default options.
+%
+% optional outputs:
+%   [plm_outputs, lEMG] = ..., filtered and rect left leg channel
+%   [plm_outputs, lEMG, rEMG] = ..., right leg channel
 
 sep_flag = 0;
 plm_outputs = struct();
@@ -73,7 +84,8 @@ plm_outputs.rLM = rLM;
 
 if sep_flag == 0
     % calculate PLM candidates by combining the legs
-    CLM = candidate_lms_rev1(rLM,lLM,epochStage,apnea_data,arousal_data,start_time,params);
+    CLM = candidate_lms_rev1(rLM,lLM,epochStage,params,apnea_data,...
+        arousal_data,start_time);
     [PLM,~] = periodic_lms(CLM,params);
     [~,ia,~] = intersect(CLM(:,1),PLM(:,1));
     CLM(ia,5) = 1; % go back and mark PLM in CLM
@@ -88,10 +100,10 @@ else
     %lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
     %rCLM = separate_candidates(rLM,epochStage,apnea_data,arousal_data,start_time,params);
     
-    lCLM = candidate_lms_rev1([],lLM,epochStage,apnea_data,...
-        arousal_data,start_time,params);
-    rCLM = candidate_lms_rev1(rLM,[],epochStage,apnea_data,...
-        arousal_data,start_time,params);
+    lCLM = candidate_lms_rev1([],lLM,epochStage,params,apnea_data,...
+        arousal_data,start_time);
+    rCLM = candidate_lms_rev1(rLM,[],epochStage,params,apnea_data,...
+        arousal_data,start_time);
     
     [lPLM,~] = periodic_lms(lCLM,params);
     [~,ia,~] = intersect(lCLM(:,1),lPLM(:,1));
@@ -124,5 +136,76 @@ nout = max(nargout,1) - 1;
 for k = 1:nout
     varargout{k} = eval(poss_outs{k});
 end
+
+end
+
+function [es,ss,se,apd,ard,hgs] = errcheck_ss(psg_struct,LAT,RAT,fs)
+%% [es,ss,se] = errcheck_ss(psg_struct,LAT,RAT,fs)
+% Extracts and handles epochStage vector (es), start and end of the
+% sleep record (ss/se), apnea/arousal vectors (apd/ard) and hynogram start
+% time (hgs).
+%
+% Don't worry about this function, it's just internal and kind of nonsense
+% otherwise
+
+% Get sleep start and end
+try
+    ss = round(psg_struct.EDFStart2HypnoInSec) * fs + 1;
+catch
+    warning('Reference to non-existent field ''EDFStart2HypnoInSec''');
+    ss = 1;
+end
+
+% Get sleep end and hypnogram
+try
+    es = psg_struct.CISRE_Hypnogram;
+    se = ss + size(es, 1) * 30 * fs;
+    
+catch
+    warning(['Reference to non-existent field ''CISRE_Hypnogram''... ',...
+        'Assuming (possibly incorrectly) that TST < 8 hours... ',...
+        'Sleep staging information will be unavailable']);
+    
+    se = ss + 960 * 30 * fs;
+    es = zeros(960,1);
+end
+
+% Get apnea, arousal data
+try
+    apd = psg_struct.CISRE_Apnea;   
+catch
+    warning('Reference to non-existent field ''CISRE_Apnea''');
+    apd = {0,0,0};
+end
+
+try
+    ard = psg_struct.CISRE_Arousal;   
+catch
+    warning('Reference to non-existent field ''CISRE_Arousal''');
+    ard = {0,0,0};
+end
+
+try
+    hgs = psg_struct.CISRE_HypnogramStart;
+catch
+    warning('Reference to non-existent field ''CISRE_HypnogramStart''');
+    hgs = '2000-01-01 00:00:00';
+end
+
+% Make sure the sleep record end (from size of hypnogram) is not beyond the
+% end of the EMG recording. The two channels should always be the same
+% length, but check to make sure.
+if se >= max(size(RAT,1),size(LAT,1))
+    se = min(size(RAT,1),size(LAT,1)); 
+end
+
+% If there are any NaNs in the record, filtering will fail. We must end the
+% record when a NaN is found
+if size(find(isnan(LAT(ss:se)),1)) > 0
+    se = ss + find(isnan(LAT(ss:se)),1) - 2; 
+end 
+if size(find(isnan(RAT(ss:se)),1)) > 0
+    se = ss + find(isnan(RAT(ss:se)),1) - 2; 
+end 
 
 end

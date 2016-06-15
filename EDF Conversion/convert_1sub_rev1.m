@@ -1,8 +1,10 @@
-function EDF = convert_1sub_rev1(varargin)
-%% EDF = convert_1sub(FilePath)
+function subj_struct = convert_1sub_rev1(varargin)
+%% EDF = convert_1sub()
+% convert EDF and event data to struct for PLM processing. 
+%
+% optional input:
+%   - filepath to subject folder containing edf and event text files.
 
-addpath(['C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\'...
-    'current_version']);
 addpath(['C:\Users\Administrator\Documents\GitHub\MATPLM (rlslabgit)\'...
     'EDF Conversion']);
 
@@ -26,16 +28,16 @@ if canc, return; end
 if isempty(havs.file_loc), return; end
 fd_format = date_format; % date format in the txt files
 
-EDF = EDF_read_jhmi_rev_101(havs.file_loc);
+subj_struct = EDF_read_jhmi_rev_101(havs.file_loc);
 %EDF = struct([]);
-EDF.EDFStart = EDF.dateTime;
+subj_struct.EDFStart = subj_struct.dateTime;
 
 if ~isempty(havs.hyp_loc) && havs.hyp
     % Hypnogram filename should contain the word 'SleepStage'
     T = readtable(havs.hyp_loc,'headerlines',havs.hyp_head,'Delimiter','\t');
     
     d = char(T.Var1(1)); 
-    EDF(1).CISRE_HypnogramStart = datestr(datenum(d,fd_format),new_format);
+    subj_struct(1).CISRE_HypnogramStart = datestr(datenum(d,fd_format),new_format);
     T = T.Var2;
     
     a = zeros(size(T,1),1);
@@ -45,9 +47,9 @@ if ~isempty(havs.hyp_loc) && havs.hyp
     a(~cellfun('isempty', strfind(T,'4'))) = 4;
     a(~cellfun('isempty', strfind(T,'REM'))) = 5;
     
-    EDF.CISRE_Hypnogram = a;
-    EDF.EDFStart2HypnoInSec = etime(datevec(EDF.CISRE_HypnogramStart),...
-        datevec(EDF.EDFStart));
+    subj_struct.CISRE_Hypnogram = a;
+    subj_struct.EDFStart2HypnoInSec = etime(datevec(subj_struct.CISRE_HypnogramStart),...
+        datevec(subj_struct.EDFStart));
 end
 
 if ~isempty(havs.ar_loc) && havs.ar
@@ -56,12 +58,12 @@ if ~isempty(havs.ar_loc) && havs.ar
     T = table2cell(T);
     if size(T,1) > 0
         T(:,1) = cellstr(datestr(datenum(T(:,1),fd_format),new_format));  
-        EDF.CISRE_Arousal = T;
+        subj_struct.CISRE_Arousal = T;
     else
-        EDF.CISRE_Arousal = cell(0);
+        subj_struct.CISRE_Arousal = cell(0);
     end
 else
-    EDF.CISRE_Arousal = cell(0);
+    subj_struct.CISRE_Arousal = cell(0);
 end
 
 if ~isempty(havs.ap_loc) && havs.ap
@@ -70,12 +72,12 @@ if ~isempty(havs.ap_loc) && havs.ap
     T = table2cell(T);
     if size(T,1) > 0
         T(:,1) = cellstr(datestr(datenum(T(:,1),fd_format),new_format));  
-        EDF.CISRE_Apnea = T;
+        subj_struct.CISRE_Apnea = T;
     else
-        EDF.CISRE_Apnea = cell(0);
+        subj_struct.CISRE_Apnea = cell(0);
     end
 else
-    EDF.CISRE_Apnea = cell(0);
+    subj_struct.CISRE_Apnea = cell(0);
 end
 
 
@@ -162,9 +164,6 @@ date_format = Formats(2,3).items{Answer.file_date};
 end
 
 function a = empty_struct(b)
-    if size(b,1) > 0
-        a = b(1).name;
-    else
-        a = '';
-    end
+    if size(b,1) > 0, a = b(1).name;
+    else a = ''; end
 end
