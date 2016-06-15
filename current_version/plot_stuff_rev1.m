@@ -26,6 +26,7 @@ for i = 1:size(PLM,1)
 end
 
 t = (1:size(lEMG))/fs/24/3600; t = t';
+t = t + datenum(plm_outputs.hypnostart);
 
 h(1) = subplot(2,1,1); reduce_plot(t,lEMG);
 legend('mLM', 'CLM', 'PLM', 'PLMS');
