@@ -1,4 +1,17 @@
 function [kEMG, did] = removeEKG_rev1(EMG,fs,t)
+%% [kEMG, did] = removeEKG_rev1(EMG,fs,t)
+% Remove EKG intereference from EMG signal by averaging out peaks when
+% intereference is detected
+% 
+% inputs:
+%   - EMG - 1 x n filtered, rectified EMG signal
+%   - fs - sampling rate (hz)
+%   - t - 1 x n array representing baseline noise (output from 'dt.m')
+%
+% outpus:
+%   - kEMG - EMG with EKG peaks smoothed out
+%   - did - boolean of whether any changes were made to original signal
+
 
 kEMG = EMG; did = false;
 % turn off peak warning, it just means there are no peaks in this epoch
@@ -20,10 +33,7 @@ for n = 0:(floor(size(EMG,1)/window_size)-1)
     
     if size(rel,1) > 20 && sum(beats)/size(rel,1) > 0.2
         did = true;
-        kEMG(cur_start:cur_end,1) = kill_peaks(interest,rel(beats),fs);
-        
-        h(1) = subplot(2,1,1); plot(h(1), interest);
-        h(2) = subplot(2,1,2); plot(h(2), kEMG(cur_start:cur_end,1));
+        kEMG(cur_start:cur_end,1) = kill_peaks(interest,rel,fs);
     end
 end
 warning('on','signal:findpeaks:largeMinPeakHeight')
@@ -40,7 +50,6 @@ backbuff = round(fs/10);
 
 cleaned = EMG;
 
-% ignore first and last, causes too many problems
 for i = 1:size(beats,1)
     
     % Bound safety check (should never be false)
