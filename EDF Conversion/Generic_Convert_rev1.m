@@ -8,11 +8,13 @@ function Generic_Convert_rev1()
 % run the program. Some required folder organization, which will be
 % described in detail in a separate file.
 %
+% Author: Frank Sgambati - JHU CISRE
 %
 % NOTES: Text file time format: YYYY-MM-DDTHH:MM:SS.LLLLLL (L = fractions)
 %
-% MODIFIED: Patrick 15Aug19 to add centisecond precision
-% MODIFIED: Patrick 16Jan1 to begin generalization process
+% MODIFIED: Patrick 19Aug15 to add centisecond precision
+% MODIFIED: Patrick 1Jan16 to begin generalization process
+% MODIFIED: Patrick 16Jun16 for even more generalization
 tic
 
 % ProtocolDIR is the path to the directory containing the subject folders.
