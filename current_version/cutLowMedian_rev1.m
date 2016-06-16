@@ -4,6 +4,8 @@ function nLM = cutLowMedian_rev1(LM,EMG,fs,t)
 % presently as a 0.5 second window with median amplitude above low
 % threshold
 %
+% REPLACED JUNE 16 WITH rev2 VERSION -> MUCH MUCH QUICKER AND SAFER
+%
 % inputs:
 %   - LM - monolateral LM array with start and stop times of each movement
 %   - EMG - EMG signal corresponding to the leg LM was derived from
