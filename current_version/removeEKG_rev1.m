@@ -20,7 +20,7 @@ window_size = fs * 30;  % try a 30 second sliding window
 
 % check 30 second segments for EKG interference. We could probably increase
 % this even more, because it is actually pretty safe, so there's not too
-% much of a penalty for overreacting
+% much of a penalty for overreacclearting
 for n = 0:(floor(size(EMG,1)/window_size)-1)
     cur_start = n*window_size+1; cur_end = (n+1)*window_size;
     interest = EMG(cur_start:cur_end,1);        

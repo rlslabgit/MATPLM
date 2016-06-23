@@ -35,8 +35,8 @@ BPloct = BPlocAndRunsArray(CLMt,params.minNumIMI);
 CLMt = markPLM3(CLMt,BPloct);
 
 PLM = CLMt(CLMt(:,5) == 1,:);
-nrPLM = PLM(PLM(:,11) > 0, :); % remove rLM (respiratory events)
-naPLM = PLM(PLM(:,12) > 0, :); % remove arousal events
+% nrPLM = PLM(PLM(:,11) > 0, :); % remove rLM (respiratory events)
+% naPLM = PLM(PLM(:,12) > 0, :); % remove arousal events
 
 % options to remove respiratory events and arousal events are not currently
 % standardized, so these will not be output by default.
