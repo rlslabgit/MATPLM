@@ -45,31 +45,31 @@ DefAns(1).fs = fs;
 
 Prompt(end+1,:) = {'Low Pass filter', 'lopass','hz'};
 Formats(1,2).type = 'edit';
-Formats(1,2).format = 'integer';
+Formats(1,2).format = 'float';
 %Formats(1,2).size = 80;
 DefAns.lopass = round(fs*0.45); % i.e. 225 at 500 hz
 
 Prompt(end+1,:) = {'High Pass filter', 'hipass','hz'};
 Formats(1,3).type = 'edit';
-Formats(1,3).format = 'integer';
+Formats(1,3).format = 'float';
 %Formats(1,3).size = 80; % automatically assign the height
 DefAns.hipass = 20;
 
 Prompt(end+1,:) = {'Maximum Duration (monolateral)', 'maxdur','s'};
 Formats(2,1).type = 'edit';
-Formats(2,1).format = 'integer';
+Formats(2,1).format = 'float';
 Formats(2,1).size = 80; % automatically assign the height
 DefAns.maxdur = 10;
 
 Prompt(end+1,:) = {'Maximum IMI', 'maxIMI','s'};
 Formats(2,2).type = 'edit';
-Formats(2,2).format = 'integer';
+Formats(2,2).format = 'float';
 %Formats(2,2).size = 80; % automatically assign the height
 DefAns.maxIMI = 90;
 
 Prompt(end+1,:) = {'Minimum IMI', 'minIMI','s'};
 Formats(2,3).type = 'edit';
-Formats(2,3).format = 'integer';
+Formats(2,3).format = 'float';
 %Formats(2,3).size = 80; % automatically assign the height
 DefAns.minIMI = 10;
 
