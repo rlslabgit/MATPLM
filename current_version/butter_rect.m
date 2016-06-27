@@ -21,5 +21,6 @@ if strcmp('rect',varargin)
     dsEMG = abs(dsEMG);    
 end
 
+% test comment
 
 end
