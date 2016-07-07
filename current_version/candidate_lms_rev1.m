@@ -69,8 +69,7 @@ if ~isempty(CLM)
         % be able to start a PLM run
         % CLM(find(CLM(:,4) < params.minIMI) + 1, 9) = 1;
     else
-        CLM = CLM(CLM(:,4) >= params.minIMI,:);
-        CLM = getIMI(CLM,500);
+        CLM = removeShortIMI(CLM,params);
     end
     
     if ~isempty(epochStage)
@@ -136,4 +135,25 @@ function LM = getIMI(LM,fs)
 LM(1,4) = 9999; % archaic... don't know if we need this
 LM(2:end,4) = (LM(2:end,1) - LM(1:end-1,1))/fs;
 
+end
+
+function CLMt = removeShortIMI(CLM,params)
+% Old way of scoring - remove movements with too short IMI, then
+% recalculate IMI and see if it fits now. There's probably a way to
+% vectorize this for speed, but I honestly don't care, no one should use
+% this anymore.
+rc = 1;      
+CLMt = [];
+
+for rl = 1:size(CLM,1);
+    if CLM (rl,4) >= params.minIMI;
+       CLMt(rc,:) = CLM(rl,:);
+       rc = rc + 1;
+    elseif rl < size(CLM,1)
+        CLM(rl+1,4)= CLM(rl+1,4)+CLM(rl,4);
+    end
+  
+end
+
+CLMt = getIMI(CLMt,params.fs);
 end
