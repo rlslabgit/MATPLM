@@ -29,10 +29,10 @@ t = (1:size(lEMG))/fs/24/3600; t = t';
 t = t + datenum(plm_outputs.hypnostart);
 
 h(1) = subplot(2,1,1); reduce_plot(t,lEMG);
-legend('mLM', 'CLM', 'PLM', 'PLMS');
+legend('none', 'mLM', 'PLM', 'PLMS');
 datetickzoom('x','HH:MM:SS');
 h(2) = subplot(2,1,2); reduce_plot(t,rEMG);
-legend('mLM', 'CLM', 'PLM', 'PLMS');
+legend('none', 'mLM', 'PLM', 'PLMS');
 linkaxes(h,'x'); datetickzoom('x','HH:MM:SS');
 
 
