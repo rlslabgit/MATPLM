@@ -9,6 +9,10 @@ function t = dt_rev1(EMG,fs)
 % good for avoiding EKG interference and other spurious, closely spaced
 % spikes.
 
+% Length, in seconds, of the lookback min and max filters.
+max_filter_length = 0.5; 
+min_filter_length = 60;
+
 % Create a smoothed signal to determine the baseline from. Smoothed signal
 % is the moving average + five standard deviations. Moving average alone
 % tends to underestimate the baseline
@@ -21,9 +25,10 @@ t = E_x + 5 * sd;
 
 % determine the baseline with two lookback filters. First, a 0.5 second
 % lookback max filter is applied to the smoothed signal, then a 60 second
-% lookback min filter.
-t = imdilate(t,ones(fs/2,1));
-t = imerode(t,ones(fs*60,1));
+% lookback min filter. These values are estimates, and need to be evaluated
+% on a large dataset
+t = imdilate(t,ones(fs*max_filter_length,1));
+t = imerode(t,ones(fs*min_filter_length,1));
 
 t(t > max(EMG)) = max(EMG);
 t(t < 0.5) = 3;
