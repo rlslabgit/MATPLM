@@ -80,9 +80,9 @@ clear tmp
 % flag sections where one leg has higher noise than the other
 t(:,3) = t(:,1) - t(:,2);
 % some rough parameters for accessing threshold differences
-suspect_ratio = 10; suspect_time = 2;
+suspect_ratio = 15; suspect_time = 30;
 if size(find(abs(t(:,3)) > suspect_ratio),1) > suspect_time * params.fs
-    display(['CAUTION: there is a significant difference in threshold',...
+    display(['CAUTION: there is a significant difference in threshold ',...
         'between legs. Visual inspection is recommended to rule out noise']);
 end
 
