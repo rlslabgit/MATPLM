@@ -12,8 +12,8 @@ function dsEMG = butter_rect(pars,EMG,ss,se,varargin)
 % optional input:
 %   - 'rect' - also rectifies the signal by using absolute value    
 
-[b,a] = butter(5,pars.hipass/pars.fs,'high');
-[d,c] = butter(5,pars.lopass/pars.fs,'low');
+[b,a] = butter(5,pars.hipass/(pars.fs/2),'high');
+[d,c] = butter(5,pars.lopass/(pars.fs/2),'low');
 dsEMG = filtfilt(b,a,EMG(ss:se,1));
 dsEMG = filtfilt(d,c,dsEMG);
 
