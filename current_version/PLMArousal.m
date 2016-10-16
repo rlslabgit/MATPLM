@@ -2,7 +2,7 @@
 % fixes. This now correctly handles fractional seconds!
 
 
-function [newPLM,h] = PLMArousal_rev2(PLM,ArousalData,HypnogramStart,lb,ub,fs)
+function [newPLM,h] = PLMArousal(PLM,ArousalData,HypnogramStart,lb,ub,fs)
 %% [newPLM] = PLMApnea_Patrick(PLM,ApneaData,HypnogramStart,lb,ub,fs)
 % PLMApnea adds Apnea Events to the 11th col of the PLM Matrix if there is
 % a PLM within -lb,+ub seconds of the event endpoint
@@ -11,6 +11,11 @@ function [newPLM,h] = PLMArousal_rev2(PLM,ArousalData,HypnogramStart,lb,ub,fs)
 
 % Form newAp, which is ApneaData with endpoint of event (in datapoints) 
 % added to 4th col. This is calculated with HypnogramStart as datapoint 1
+if size(ArousalData,1) == 0
+    newPLM = PLM;
+    newPLM(1,12) = 0;
+    return    
+end
 if ArousalData{1,1} == 0
     newPLM = PLM;
     newPLM(1,12) = 0;

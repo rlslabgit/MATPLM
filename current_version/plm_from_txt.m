@@ -9,7 +9,7 @@ function [lm_tbl,PLM] = plm_from_txt(filename,varargin)
 %                - defaults to August 23, 2016 9:00 pm
 %
 % TODO: support different event types - right now we don't care as long as
-% it is in the LM txt file
+% it is in the LM txt file - specifically, allow left/right
 
 % testing path
 % 'D:\Glutamate Study\AidRLS, G00583_V1N1 - 5_15_2013\G00583_V1N1 AidRLS-Events PLM.txt'
@@ -30,7 +30,7 @@ p.addParameter('headerlines',-1,@(x) x >= 0);
 
 % locations of the start time (t) in some parseable date format, type of
 % the event and duration in seconds
-p.addParameter('t_type_dur',[1,2,3],@(x) size(x,1) == 3);
+p.addParameter('t_type_dur',[1,2,3],@(x) size(x,2) == 3);
 
 % date format of the 'start' column of the input file. No check on this, so
 % be careful I guess
@@ -67,13 +67,27 @@ tmp_start = datenum(lm_tbl{1,1},p.Results.datef) - 60/86400;
 % manipulate the date input than to rewrite my scoring code
 LM(:,1) = datenum(lm_tbl{:,1},p.Results.datef);
 LM(:,1) = round((LM(:,1) - tmp_start) * 86400 * 500);
-lm_tbl.pointid = LM(:,1);
+lm_tbl.pointid = LM(:,1); % know which point we used
+LM(:,2) = LM(:,1) + 500 * lm_tbl{:,3};
+
+% TODO: make left/right explicit
+
+% this is a toolbox function, I should add this to the repo at some point
+% but I like having one global version
+LM = remove_overlap(LM,500,0.5);
 
 params = getInput2(500,1);
 
-LM(:,2) = LM(:,1) + 500 * lm_tbl{:,3};
+
 CLM = candidate_lms(LM,[],ep,params);
 x = periodic_lms(CLM,params);
+
+plm_results = struct();
+plm_results.PLM = x;
+plm_results.PLMS = x(x(:,6) > 0,:);
+plm_results.CLM = CLM;
+plm_results.CLMS = CLM(CLM(:,6) > 0,:);
+plm_results.epochstage = ep;
 
 % put this all into a table for easier access
 P = array2table(x(:,[1:4,6,8:9]));
@@ -89,4 +103,5 @@ PLM = table(starts,stops,x{:,3},x{:,4},x{:,5},x{:,6},x{:,7});
 PLM.Properties.VariableNames = {'start','stop','duration','imi',...
     'sleepstage','epoch','breakpoint'};
 
+generate_report(plm_results, params);
 end

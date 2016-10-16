@@ -93,13 +93,22 @@ DefAns.thresh = true;
 
 % Currently, there is no option to change these features in the dialog box
 % most users will not care.
-% first four are related to associating 
-in.lb1 = 0.5;
-in.ub1 = 0.5;
+
+% respiratory event associations
+in.lb1 = 2;
+in.ub1 = 10.25;
+
+% arousal event associations
 in.lb2 = 0.5;
 in.ub2 = 0.5;
+
+% intermovement intervals for a PLM run
 in.minNumIMI = 3;
+
+% max monolateral movements to combine into a bilateral
 in.maxcomb = 4;
+
+% maximum duration of a bilateral movement
 in.bmaxdur = 15;
 end
 
