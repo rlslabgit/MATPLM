@@ -1,4 +1,9 @@
 function generate_report(plm_outputs, params)
+%% generate_report(plm_outputs, params)
+% Display to console pertinent features
+% plm_outputs must at least contain epochstage,PLM,PLMS,CLM
+%
+% TOD0: report log IMI, allow output to file
 
 ep = plm_outputs.epochstage;
 TST = sum(ep > 0,1)/120; TWT = sum(ep == 0,1)/120; 
@@ -66,6 +71,19 @@ display(sprintf('mean PLMS-R duration: %.2f s',PLMS_Rdur));
 
 PLMW_dur = mean(plm_outputs.PLM(plm_outputs.PLM(:,6) == 0,3));
 display(sprintf('mean PLMW-N duration: %.2f s',PLMW_dur));
+
+% Next 4 are some IMI stuff
+PLMS_imi = mean(plm_outputs.PLMS(plm_outputs.PLMS(:,9) == 0,4));
+display(sprintf('mean PLMS IMI: %.2f s',PLMS_imi));
+
+PLMS_Nimi = mean(plm_outputs.PLMS(plm_outputs.PLMS(plm_outputs.PLMS(:,9) == 0,6) < 5,4));
+display(sprintf('mean PLMS-N IMI: %.2f s',PLMS_Nimi));
+
+PLMS_Rimi = mean(plm_outputs.PLMS(plm_outputs.PLMS(plm_outputs.PLMS(:,9) == 0,6) == 5,4));
+display(sprintf('mean PLMS-R IMI: %.2f s',PLMS_Rimi));
+
+PLMW_imi = mean(plm_outputs.PLM(plm_outputs.PLM(plm_outputs.PLMS(:,9) == 0,6) == 0,4));
+display(sprintf('mean PLMW-N IMI: %.2f s',PLMW_imi));
 
 % The next 2 displays are duration for CLM with IMI less than the min IMI
 short_CLMSdur = mean(plm_outputs.CLMS(plm_outputs.CLMS(:,4) < params.minIMI,3));

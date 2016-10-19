@@ -42,11 +42,13 @@ elseif ~isempty(lLM)
     lLM(lLM(1:end-1,3) > params.maxdur, 9) = 4; % too long mclm
     
     CLM = lLM;
+    CLM(:,11:13) = 0; % we need these columns anyway
 elseif ~isempty(rLM)
     rLM(:,3) = (rLM(:,2) - rLM(:,1))/params.fs;    
     rLM(rLM(1:end-1,3) > params.maxdur, 9) = 4; % too long mclm
     
     CLM = rLM;
+    CLM(:,11:13) = 0; % we need these columns anyway
 end
 
 % if a bilateral movement consists of one or more monolateral movements
@@ -106,7 +108,7 @@ if ~isempty(CLM)
     % currently well defined in the literature for combined legs, and we
     % have omitted it temporarily
     CLM(:,10) = 0;
-    
+        
     % Add apnea events (col 11) and arousal events (col 12)
     if exist('apd','var') && exist('hgs','var')
         CLM = PLMApnea(CLM,apd,hgs,params.lb1,params.ub1,params.fs);
