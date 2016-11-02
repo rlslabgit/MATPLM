@@ -107,15 +107,29 @@ if ~isempty(CLM)
     % The area of the leg movement should go here. However, it is not
     % currently well defined in the literature for combined legs, and we
     % have omitted it temporarily
-    CLM(:,10) = 0;
+    CLM(:,10:12) = 0;
         
     % Add apnea events (col 11) and arousal events (col 12)
     if exist('apd','var') && exist('hgs','var')
         CLM = PLMApnea(CLM,apd,hgs,params.lb1,params.ub1,params.fs);
+        
+%         CLM(CLM(:,11) > 0, 9) = 11; % BP 11 for apnea event?
+        
+        % remove the movements and recalculate IMI. If we take this route,
+        % remember that it adds an "invisible breakpoint" - aka, the
+        % movement AFTER the respiratory event will carry the breakpoint
+        % that applied to the removed movement. i.e., if a too-long IMI
+        % movement is associated with apnea event, make sure that the next
+        % movement is broken so that the run cannot continue erroneously.
+        CLMap = CLM(CLM(:,11) > 0, :); % just in case we want this later
+        CLM(find(CLM(1:end-1,11) > 0)+1,9) = ...
+            CLM(CLM(1:end-1,11) > 0,9);
+        CLM = CLM(CLM(:,11) == 0, :);
     end
     if exist('ard','var') && exist('hgs','var')
         CLM = PLMArousal(CLM,ard,hgs,params.lb2,params.ub2,params.fs);
     end
+    
 end
 
 end
