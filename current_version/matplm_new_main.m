@@ -1,4 +1,4 @@
-function [plm_outputs, varargout] = matplm_new_main_rev1(psg_struct,varargin)
+function [plm_outputs, varargout] = matplm_new_main(psg_struct,varargin)
 %% [plm_outputs] = matplm_new_main(psg_struct)
 % The main driving function for the MATPLM program. Returns a structure of
 % arrays with descriptions of PLMS and other, more general movements.
@@ -72,8 +72,19 @@ rEMG = butter_rect(params,rEMG,rec_start,rec_end,'rect');
 
 % Also note the '+6' after *minT: the high threshold is traditionally 8
 % microvolts above the noise (or 6 above the low threshold)
-lLM = new_indices_rev1(lEMG,params);
-rLM = new_indices_rev1(rEMG,params);
+t = [lEMG * 0, rEMG * 0];
+[lLM, tmp] = new_indices(lEMG,params); t(:,1) = tmp(:,1);
+[rLM, tmp] = new_indices(rEMG,params); t(:,2) = tmp(:,1);
+clear tmp
+
+% flag sections where one leg has higher noise than the other
+t(:,3) = t(:,1) - t(:,2);
+% some rough parameters for accessing threshold differences
+suspect_ratio = 15; suspect_time = 30;
+if size(find(abs(t(:,3)) > suspect_ratio),1) > suspect_time * params.fs
+    display(['CAUTION: there is a significant difference in threshold ',...
+        'between legs. Visual inspection is recommended to rule out noise']);
+end
 
 % we always want these in the output array
 plm_outputs.lLM = lLM;
@@ -84,7 +95,7 @@ plm_outputs.rLM = rLM;
 
 if sep_flag == 0
     % calculate PLM candidates by combining the legs
-    CLM = candidate_lms_rev1(rLM,lLM,epochStage,params,apnea_data,...
+    CLM = candidate_lms(rLM,lLM,epochStage,params,apnea_data,...
         arousal_data,start_time);
     [PLM,~] = periodic_lms(CLM,params);
     [~,ia,~] = intersect(CLM(:,1),PLM(:,1));
@@ -96,13 +107,14 @@ if sep_flag == 0
     plm_outputs.PLMS = PLM(PLM(:,6) > 0,:);
     plm_outputs.CLMS = CLM(CLM(:,6) > 0,:);
 else
-    % get CLM from each leg seperately
-    %lCLM = separate_candidates(lLM,epochStage,apnea_data,arousal_data,start_time,params);
-    %rCLM = separate_candidates(rLM,epochStage,apnea_data,arousal_data,start_time,params);
-    
-    lCLM = candidate_lms_rev1([],lLM,epochStage,params,apnea_data,...
+    % get CLM from each leg seperately    
+%     lCLM = candidate_lms_rev2([],lLM,epochStage,params,apnea_data,...
+%         arousal_data,start_time);
+%     rCLM = candidate_lms_rev2(rLM,[],epochStage,params,apnea_data,...
+%         arousal_data,start_time);
+    lCLM = candidate_lms([],lLM,epochStage,params,apnea_data,...
         arousal_data,start_time);
-    rCLM = candidate_lms_rev1(rLM,[],epochStage,params,apnea_data,...
+    rCLM = candidate_lms(rLM,[],epochStage,params,apnea_data,...
         arousal_data,start_time);
     
     [lPLM,~] = periodic_lms(lCLM,params);
@@ -131,7 +143,7 @@ plm_outputs.column_headers = {'Start','End','Duration','IMI','isPLM','SleepStage
     'Lateraltiynessment'};
 
 
-poss_outs = {'lEMG', 'rEMG'};
+poss_outs = {'lEMG', 'rEMG','t'};
 nout = max(nargout,1) - 1;
 for k = 1:nout
     varargout{k} = eval(poss_outs{k});
