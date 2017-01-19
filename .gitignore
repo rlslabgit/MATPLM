@@ -11,3 +11,5 @@ MATPLM_test.prj
 nochoice.m
 MATPLM_test/
 tmp*
+current_version/bullshit*
+current_version/tmp*
