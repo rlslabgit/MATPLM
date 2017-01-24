@@ -13,3 +13,4 @@ MATPLM_test/
 tmp*
 current_version/bullshit*
 current_version/tmp*
+*html*

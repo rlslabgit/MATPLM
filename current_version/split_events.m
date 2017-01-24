@@ -8,6 +8,7 @@ function output = split_events(events_file)
 % TODO: consider making use of 'position' channel - no need at the moment,
 % but perhaps it would be of clinical significance
 % TODO: multilanguage support for left/right emg
+% DEPRECATED 1/24/17 - see EDF Conversion/one_subj_working
 
 event_types = readtable('event_types.csv');
 
