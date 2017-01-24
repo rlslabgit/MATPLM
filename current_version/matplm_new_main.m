@@ -1,4 +1,4 @@
-function [plm_outputs, varargout] = matplm_new_main(psg_struct,varargin)
+function [plm_outputs, varargout] = matplm_new_main(varargin)
 %% [plm_outputs] = matplm_new_main(psg_struct)
 % The main driving function for the MATPLM program. Returns a structure of
 % arrays with descriptions of PLMS and other, more general movements.
@@ -16,21 +16,28 @@ function [plm_outputs, varargout] = matplm_new_main(psg_struct,varargin)
 %   [plm_outputs, lEMG] = ..., filtered and rect left leg channel
 %   [plm_outputs, lEMG, rEMG] = ..., right leg channel
 
-sep_flag = 0;
-plm_outputs = struct();
+p = inputParser;
+p.CaseSensitive = false;
 
-if isempty(psg_struct)
+p.addOptional('psg_struct','');
+p.addOptional('separate_legs',false,@islogical);
+
+p.parse(varargin{:})
+
+if isempty(p.Results.psg_struct)
    [filename, filepath] = uigetfile('*.mat', 'Open a patient file:' );
    psg_struct = load(fullfile(filepath,filename));
    psg_struct = psg_struct.(char(fieldnames(psg_struct)));
 end
 
-if strcmp('separate_legs',varargin)
+if p.Results.separate_legs
     display('MATPLM will calculate CLM/PLM for each leg separately');
     sep_flag = 1;
+else
+    sep_flag = 0;
 end
 
-
+plm_outputs = struct();
 %% Extract necessary data from structure
 % find the LAT and RAT channels in the structure
 % TODO: support different channel naming styles

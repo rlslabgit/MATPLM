@@ -16,7 +16,7 @@ function [EDF] = EDF_read_jhmi_rev_101(FilePath)
 % RETURNS: A Matlab file containing a structure of the EDF data.
 %
 % MODIFIED:
-%
+%7
 % DESCRIPTION: 
 
 %% Read and load EDF traces from RemLogic%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

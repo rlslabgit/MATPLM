@@ -15,6 +15,7 @@ function Generic_Convert_rev1()
 % MODIFIED: Patrick 19Aug15 to add centisecond precision
 % MODIFIED: Patrick 1Jan16 to begin generalization process
 % MODIFIED: Patrick 16Jun16 for even more generalization
+% DEPRECATED: 24Jan17 
 tic
 
 % ProtocolDIR is the path to the directory containing the subject folders.
