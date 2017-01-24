@@ -1,6 +1,6 @@
 function subj_struct = one_subj_working(varargin)
 
-%% All arguments are optional
+%% All arguments are optional, dialog windows will open if absent
 p = inputParser;
 p.CaseSensitive = false;
 
@@ -21,6 +21,7 @@ new_format = 'yyyy-mm-dd HH:MM:SS.fff'; % this is what the program wants
 if strcmp(p.Results.edf_loc,'ask')
     [edf_file,edf_path] = uigetfile('.edf','Select input event files:',...
         p.Results.root,'MultiSelect','off');
+    if edf_file == 0, error('No edf file selected'); end
     edf_loc = fullfile(edf_path,edf_file);
 else
     edf_loc = p.Results.edf_loc;
@@ -29,6 +30,7 @@ end
 if strcmp(p.Results.event_loc,'ask')
     [events_file,event_path] = uigetfile('.txt','Select input event files:',...
         edf_path,'MultiSelect','off');
+    if events_file == 0, error('No event file selected'); end
     event_loc = fullfile(event_path,events_file);
 else
     event_loc = p.Results.event_loc;
@@ -38,6 +40,7 @@ if strcmp(p.Results.button,'ask')
     button = questdlg(['Please specify which scoring options you would '...
         'like to use'],'Scoring Options','Standard','Most Recent','New',...
         'Most Recent');
+    if isempty(button), error('Scoring option window closed'); end
 else
     button = p.Results.button;
 end
