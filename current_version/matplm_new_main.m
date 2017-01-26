@@ -19,8 +19,8 @@ function [plm_outputs, varargout] = matplm_new_main(varargin)
 p = inputParser;
 p.CaseSensitive = false;
 
-p.addOptional('psg_struct','');
-p.addOptional('separate_legs',false,@islogical);
+p.addParameter('psg_struct',struct());
+p.addParameter('separate_legs',false,@islogical);
 
 p.parse(varargin{:})
 
@@ -28,6 +28,8 @@ if isempty(p.Results.psg_struct)
    [filename, filepath] = uigetfile('*.mat', 'Open a patient file:' );
    psg_struct = load(fullfile(filepath,filename));
    psg_struct = psg_struct.(char(fieldnames(psg_struct)));
+else
+    psg_struct = p.Results.psg_struct;
 end
 
 if p.Results.separate_legs
