@@ -9,6 +9,8 @@ function CLM = candidate_lms(rLM,lLM,epochStage,params, varargin)
 % movement is from: 1 is right, 2 is left and 3 is bilateral.
 %
 % edit 11Jul16 - correct duration exclusion logic, recode breakpoint events
+% TODO: replace this file with the version from Post-Processing for
+% dramatic speedup of apnea/arousal associations
 %
 % inputs:
 %   - rLM - array from right leg (needs start and stop times)
