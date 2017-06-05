@@ -132,11 +132,11 @@ while ~feof(fid)
             tformat = 'yyyy-mm-ddTHH:MM:SS';
         end
         indata=true;
-        label_line = {'Time','Event','Duration','Location'};
+        label_line = {'Time','Event','Duration'};%,'Location'};
         
-        sleep_stages = cell2table(cell(0,4),'VariableNames',label_line');
-        arousals = cell2table(cell(0,4),'VariableNames',label_line');
-        apneas = cell2table(cell(0,4),'VariableNames',label_line');
+        sleep_stages = cell2table(cell(0,3),'VariableNames',label_line');
+        arousals = cell2table(cell(0,3),'VariableNames',label_line');
+        apneas = cell2table(cell(0,3),'VariableNames',label_line');
     end
     
     tline = fgetl(fid);

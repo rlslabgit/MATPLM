@@ -1,4 +1,4 @@
-function CLM = candidate_lms(rLM,lLM,epochStage,params, varargin)
+function CLM = candidate_lms_old(rLM,lLM,epochStage,params, varargin)
 %% CLM = candidate_lms_rev1(rLM,lLM,epochStage,params, varargin)
 % Determine candidate leg movements for PLM from monolateral LM arrays. If
 % either rLM or lLM is empty ([]), this will return monolateral candidates,

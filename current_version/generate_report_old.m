@@ -1,9 +1,11 @@
-function generate_report(plm_outputs, params)
+function generate_report_old(plm_outputs, params)
 %% generate_report(plm_outputs, params)
 % Display to console pertinent features
 % plm_outputs must at least contain epochstage,PLM,PLMS,CLM
 %
 % TOD0: report log IMI, allow output to file
+% THIS PROBABLY DOESN'T WORK ANYMORE DUE TO MODIFICATIONS FOR CONFORMITY
+% WITH PLM-POST-PROCESSING
 
 ep = plm_outputs.epochstage;
 TST = sum(ep > 0,1)/120; TWT = sum(ep == 0,1)/120; 
