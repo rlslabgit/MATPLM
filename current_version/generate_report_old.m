@@ -1,4 +1,4 @@
-function generate_report_old(plm_outputs, params)
+   bfunction generate_report_old(plm_outputs, params)
 %% generate_report(plm_outputs, params)
 % Display to console pertinent features
 % plm_outputs must at least contain epochstage,PLM,PLMS,CLM

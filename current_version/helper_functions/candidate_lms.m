@@ -20,7 +20,7 @@ function [CLM,CLMnr] = candidate_lms(rLM,lLM,epochStage,params,tformat,varargin)
 % optional inputs (in this order):
 %   - apd - apnea data, from the original subject struct
 %   - ard - arousal data
-%   - hgs - hypnogram start time
+%   - hgs - hypnogram start time 
 %
 % IMPORTANT! This file only for use with EDF+ scoring procedure, which
 % fails when we treat the duration as a string.

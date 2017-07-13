@@ -15,11 +15,11 @@ function [plm_outputs, varargout] = matplm_new_main(varargin)
 % optional outputs:
 %   [plm_outputs, lEMG] = ..., filtered and rect left leg channel
 %   [plm_outputs, lEMG, rEMG] = ..., right leg channel
-
+addpath('helper_functions')
 p = inputParser;
 p.CaseSensitive = false;
 
-p.addParameter('psg_struct',struct());
+p.addOptional('psg_struct','askme',@isstruct);
 p.addParameter('separate_legs',false,@islogical);
 
 buttonval = @(x) assert(strcmp(x,'Standard') || strcmp(x,'Most Recent')...
@@ -28,7 +28,7 @@ p.addParameter('button','ask',buttonval);
 
 p.parse(varargin{:})
 
-if isempty(p.Results.psg_struct)
+if strcmp(p.Results.psg_struct,'askme')
    [filename, filepath] = uigetfile('*.mat', 'Open a patient file:' );
    psg_struct = load(fullfile(filepath,filename));
    psg_struct = psg_struct.(char(fieldnames(psg_struct)));
@@ -37,7 +37,7 @@ else
 end
 
 if p.Results.separate_legs
-    display('MATPLM will calculate CLM/PLM for each leg separately');
+    disp('MATPLM will calculate CLM/PLM for each leg separately');
     sep_flag = 1;
 else
     sep_flag = 0;
@@ -50,8 +50,8 @@ plm_outputs = struct();
 % TODO: support different channel naming styles
 %   solution: add these names when we convert
 lbls = extractfield(psg_struct.Signals,'label');
-lidx = find(not(cellfun('isempty', strfind(lbls,'Left'))));
-ridx = find(not(cellfun('isempty', strfind(lbls,'Right'))));
+lidx = find(contains(lbls,'Left'));
+ridx = find(contains(lbls,'Right'));
 
 lEMG = psg_struct.Signals(lidx(1)).data;
 rEMG = psg_struct.Signals(ridx(1)).data;
@@ -104,7 +104,7 @@ t(:,3) = t(:,1) - t(:,2);
 % some rough parameters for accessing threshold differences
 suspect_ratio = 15; suspect_time = 30;
 if size(find(abs(t(:,3)) > suspect_ratio),1) > suspect_time * last_used.fs
-    display(['CAUTION: there is a significant difference in threshold ',...
+    warning(['there is a significant difference in threshold ',...
         'between legs. Visual inspection is recommended to rule out noise']);
 end
 
@@ -117,14 +117,9 @@ plm_outputs.rLM = rLM;
 
 if sep_flag == 0
     % calculate PLM candidates by combining the legs
-%     CLM = candidate_lms_old(rLM,lLM,epochStage,params,apnea_data,...
-%         arousal_data,start_time);
     [CLM,CLMnr] = candidate_lms(rLM,lLM,epochStage,last_used,tformat,...
         apnea_data,arousal_data,start_time);
-%     [PLM,~] = periodic_lms(CLM,params);
-%     [~,ia,~] = intersect(CLM(:,1),PLM(:,1));
-%     CLM(ia,5) = 1; % go back and mark PLM in CLM
-    
+
     % store output vectors in struct
     plm_outputs.CLMnr = CLMnr;
     plm_outputs.CLM = CLM;
@@ -138,10 +133,6 @@ if sep_flag == 0
 
 else % WARNING - this may not play nicely with the reporting...
     % get CLM from each leg seperately    
-%     lCLM = candidate_lms_rev2([],lLM,epochStage,params,apnea_data,...
-%         arousal_data,start_time);
-%     rCLM = candidate_lms_rev2(rLM,[],epochStage,params,apnea_data,...
-%         arousal_data,start_time);
     lCLM = candidate_lms([],lLM,epochStage,last_used,apnea_data,...
         arousal_data,start_time);
     rCLM = candidate_lms(rLM,[],epochStage,last_used,apnea_data,...
